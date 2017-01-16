@@ -1,6 +1,7 @@
 from vector import Vector
 import pygame
 from random import choice as random_choice
+from spritesheet import Spritesheet
 
 # TODO DRY
 SCREEN_SIZE = (800, 600)
@@ -9,9 +10,8 @@ class World:
 
     def __init__(self):
         self.entities = {'all': pygame.sprite.Group()}
-        bg_tiles = list()
-        for i in xrange(1, 4):
-            bg_tiles.append(pygame.image.load('images/floor{}.png'.format(i)).convert())
+        ss = Spritesheet('images/metalfloor.png', 64)
+        bg_tiles = ss.get_images()
 
         self.background = pygame.surface.Surface(SCREEN_SIZE)
         # 32 is the size of the tile

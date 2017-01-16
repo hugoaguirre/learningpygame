@@ -26,3 +26,6 @@ class Spritesheet(object):
         # self.spritesheet is already alpha
         image.blit(self.spritesheet, (0, 0), rect)
         return image
+
+    def get_images(self):
+        return [self.get_image(i) for i in range(0, self.number_sprites-1)]

@@ -23,7 +23,7 @@ class MainMenu:
         self.main()
 
     def main(self):
-        pygame.mixer.music.load("menu.wav")
+        pygame.mixer.music.load("music/menu.wav")
         pygame.mixer.music.play(-1)
 
         while True:

@@ -1,8 +1,14 @@
-grass.png: http://opengameart.org/node/8054
-GPL2 GPL3 CCBYSA3.0
+metalfloor.png
+Adapted from http://opengameart.org/content/basic-32x32-sci-fi-tiles-for-roguelike
+CC-BY 3.0 OGA-BY 3.0
 
-gauntlet.png http://opengameart.org/content/dwarven-cursor
-CCBYSA3.0 GPL 2.0
-
-sara.png http://opengameart.org/content/sara-steps-in-the-right-direction
+sara.png
+Adapted from http://opengameart.org/content/sara-steps-in-the-right-direction
 CCBY3.0 OGABY3.0
+
+robot.png
+Taken from http://opengameart.org/content/3x-updated-32x32-scifi-roguelike-enemies
+CCBY3.0 OGABY3.0
+
+laser.png redlaser.png
+Public Domain
