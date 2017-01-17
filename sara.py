@@ -21,6 +21,7 @@ class Sara(Entity):
         self.animation = 0
         self.animation_time = 0
         self.moving = False
+        self.passable = False
 
         # Weapon init
         self.weapon = Weapon(self, world)
