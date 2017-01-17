@@ -38,3 +38,6 @@ If you are not used to git you can read this chapter https://git-scm.com/book/en
     git add <the file you need to commit>
     git commit  # will open an editor, write a comment there
     git push --set-upstream origin <name_of_your_branch>
+
+Once your changes are pushed, you can go to https://github.com/juanjosegzl/learningpygame and create a new Pull Request
+Search for the buttom Compare & pull request
