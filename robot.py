@@ -4,7 +4,7 @@ from random import randint
 from statemachine import State
 from vector import Vector
 
-
+SCREEN_SIZE = (800, 600)
 ROBOT_IMAGE_FILENAME = "images/robot.png"
 
 
@@ -14,6 +14,7 @@ class Robot(Entity):
         sprite = pygame.image.load(ROBOT_IMAGE_FILENAME).convert_alpha()
         super(Robot, self).__init__(world, 'Robot', sprite)
         self.passable = False
+        self.can_leave_screen = False
 
         shoting_state = RobotStateShoting(self)
         waiting_state = RobotStateWaiting(self)
@@ -45,7 +46,6 @@ class RobotStateDodging(State):
         x = self.robot.location.x
         y = self.robot.location.y
         self.robot.destination = Vector(randint(x-200, x+200), randint(y-200, y + 200))
-        self.robot.keep_inside_screen()
 
     def do_actions(self):
         # just move once and then do nothing

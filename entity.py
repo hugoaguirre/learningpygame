@@ -22,6 +22,7 @@ class Entity(pygame.sprite.Sprite):
         self.destination = None
         self.speed = 0.0
         self.passable = True  # you can occupy the same space that this entity
+        self.can_leave_screen = True
 
         self.brain = StateMachine()
 
@@ -43,6 +44,8 @@ class Entity(pygame.sprite.Sprite):
 
     def move(self, time_passed):
         if self.speed > 0 and self.location != self.destination:
+            if not self.can_leave_screen:
+                self.keep_inside_screen()
             if not self.passable:
                 old_location = self.location
 
@@ -56,11 +59,14 @@ class Entity(pygame.sprite.Sprite):
                               self.location.y + vec_to_destination.y)
 
             # cancel movement
-            if not self.passable and self.keep_personal_space():
+            if not self.passable and self.is_colliding_with_impassable_entities():
                 # because movement is interrupted can be defined as a float, which may lead to troubles
                 self.set_location(int(old_location.x), int(old_location.y))
                 self.destination = self.location
             return True
+        # Known issue: if there is a collition between impassable entities when they are not moving
+        # e.g. during first render, they won't be able to cancel any movement and they will stay blocked
+
         return False
 
     def keep_inside_screen(self):
@@ -74,7 +80,7 @@ class Entity(pygame.sprite.Sprite):
         elif self.destination.y > SCREEN_SIZE[1] - self.image.get_height():
             self.destination.y = SCREEN_SIZE[1] - self.image.get_height()
 
-    def keep_personal_space(self):
+    def is_colliding_with_impassable_entities(self):
         entities = self.world.get_impassable_entities(but_me=self)
         collisions = pygame.sprite.spritecollide(self, entities, False)
         return len(collisions) != 0
