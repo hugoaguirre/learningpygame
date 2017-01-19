@@ -75,3 +75,6 @@ class World:
 
         for entity in self.entities['events']:
             entity.process_events(events)
+
+    def get_player(self):
+        return self.entities['player'].sprites()[0]
