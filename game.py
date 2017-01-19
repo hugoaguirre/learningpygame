@@ -7,6 +7,7 @@ from spider import Spider
 from world import World
 from os import remove as os_remove
 from PIL import Image, ImageFilter
+from settings import settings
 
 
 # TODO move this to a unique source
@@ -59,7 +60,7 @@ class Game:
 
             events = pygame.event.get()
             for event in events:
-                if event.type == Game.SONG_END:
+                if event.type == Game.SONG_END and not settings['debug']:
                     pygame.mixer.music.load('music/main.wav')
                     pygame.mixer.music.play(-1)
             self.world.process_events(events)
