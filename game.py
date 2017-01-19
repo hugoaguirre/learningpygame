@@ -1,8 +1,9 @@
 import pygame
 import menu
-from random import randint
+from random import randint, choice as random_choice
 from sara import Sara
 from robot import Robot
+from spider import Spider
 from world import World
 from os import remove as os_remove
 from PIL import Image, ImageFilter
@@ -32,6 +33,7 @@ class Game:
         sara.set_location(100, SCREEN_SIZE[1] / 2)
         self.world.add_entity(sara, ('events', 'player'))
 
+        self.robots_created = 0
         self.create_robot()
         self.create_robot()
         self.create_robot()
@@ -40,9 +42,20 @@ class Game:
 
     def main(self):
         should_quit = False
+        possible_enemies = [None] * 101
+        possible_enemies[100] = self.create_robot
+
         while not should_quit:
-            if randint(1, 500) == 1:
-                self.create_robot()
+            if randint(1, 250) == 1:
+                # Create an enemy
+                hard = randint(0, 99)
+                for enemy_creator in possible_enemies[hard:]:
+                    if enemy_creator:
+                        enemy_creator()
+
+            # Adding enemies
+            if self.robots_created == 5:
+                possible_enemies[30] = self.create_spider
 
             events = pygame.event.get()
             for event in events:
@@ -75,3 +88,9 @@ class Game:
         robot = Robot(self.world)
         robot.set_location(randint(0, SCREEN_SIZE[0]), randint(0, SCREEN_SIZE[1]))
         self.world.add_entity(robot, ('enemies', ))
+        self.robots_created += 1
+
+    def create_spider(self):
+        spider = Spider(self.world)
+        spider.set_location(200, 1)
+        self.world.add_entity(spider, ('enemies',))
