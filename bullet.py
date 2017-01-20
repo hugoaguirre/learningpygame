@@ -12,24 +12,17 @@ class Bullet(Entity):
     """ Make the bullets independant 
         Make the bullets great again """
 
-    def __init__(self, world):
+    def __init__(self, world, flip=False):
 
         sprite = pygame.image.load(LASER_IMG_FILENAME).convert()
         sprite.set_colorkey(BLACK)
-        super(Bullet, self).__init__(world, 'bulllet', sprite)
+        super(Bullet, self).__init__(world, 'bulllet', sprite, flip=flip)
 
         # Bullet settings
         self.speed = 300
-        self.width = 5
-        self.height = 15
-
-        self.rect = pygame.Rect(0,0, self.width, self.height)
-
-        # Store the bullet's position as a decimal value
-        self.x = float(self.rect.x)
 
     def process(self, time_passed):
         if not self.destination:
-            self.destination = Vector(SCREEN_SIZE[0] + self.image.get_width(),
-                                      self.location.y)
+            x = 0 - self.get_width() if self.is_flip() else SCREEN_SIZE[0] + self.get_width()
+            self.destination = Vector(x, self.location.y)
         super(Bullet, self).process(time_passed)
