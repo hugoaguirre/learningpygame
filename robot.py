@@ -6,7 +6,7 @@ from vector import Vector
 
 SCREEN_SIZE = (800, 600)
 ROBOT_IMAGE_FILENAME = "images/robot.png"
-
+SCREEN_SIZE = (800, 600)
 
 class Robot(Entity):
     SPEED = 100
@@ -24,7 +24,7 @@ class Robot(Entity):
         self.brain.add_state(waiting_state)
         self.brain.add_state(dodging_state)
 
-        self.brain.set_state('shoting')
+        self.brain.set_state('waiting')
 
         self.last = pygame.time.get_ticks()
         self.cooldown = 300
@@ -32,7 +32,7 @@ class Robot(Entity):
     def shoot(self):
         x = self.location.x
         y = self.location.y
-        laser = Laser(self.world)
+        laser = Laser(self.world, flip=self.is_flip())
         laser.set_location(x, y)
         self.world.add_entity(laser, ('enemy_shots', ))
 
@@ -52,6 +52,13 @@ class RobotStateDodging(State):
         pass
 
     def check_conditions(self):
+        sara = self.robot.world.get_player()
+
+        if sara.location.x < self.robot.location.x:
+            self.robot.flip()
+        else:
+            self.robot.reverse_flip()
+
         if (self.robot.location.x == float(self.robot.destination.x) and
             self.robot.location.y == float(self.robot.destination.y)):
             return 'shoting'
@@ -89,15 +96,16 @@ class RobotStateWaiting(State):
 LASER_IMAGE_FILENAME = 'images/redlaser.png'
 class Laser(Entity):
 
-    def __init__(self, world):
+    def __init__(self, world, flip=False):
         sprite = pygame.image.load(LASER_IMAGE_FILENAME).convert_alpha()
-        super(Laser, self).__init__(world, 'laser', sprite)
+        super(Laser, self).__init__(world, 'laser', sprite, flip=flip)
         self.speed = 600
 
     def process(self, time_passed):
         if not self.destination:
+            x = 0 - self.get_width() if self.is_flip() else SCREEN_SIZE[0] + self.get_width()
             self.destination = Vector(
-                -self.image.get_width(),
+                x,
                 self.location.y
             )
         super(Laser, self).process(time_passed)
