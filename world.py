@@ -3,12 +3,12 @@ import pygame
 from random import choice as random_choice
 from spritesheet import Spritesheet
 from settings import settings
+from constants import ENEMY_DESTROYED_EVENT
 
 # TODO DRY
 SCREEN_SIZE = (800, 600)
 
 class World:
-
     def __init__(self):
         self.entities = {'all': pygame.sprite.Group()}
         ss = Spritesheet('images/metalfloor.png', 64)
@@ -42,8 +42,10 @@ class World:
             for enemy in self.entities['enemies']:
                 collisions = pygame.sprite.spritecollide(enemy, self.entities['ally_shots'], True)
                 if collisions:
-                    self.entities['all'].remove(enemy)
-                    self.entities['enemies'].remove(enemy)
+                    event = pygame.event.Event(ENEMY_DESTROYED_EVENT, enemy_class=enemy.__class__)
+                    pygame.event.post(event)
+                    enemy.kill()
+
         if self.entities.get('enemy_shots') and not settings['debug']:
             for player in self.entities['player']:
                 collisions = pygame.sprite.spritecollide(player, self.entities['enemy_shots'], True)

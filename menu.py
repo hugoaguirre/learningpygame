@@ -2,7 +2,7 @@ from sys import exit as sys_exit
 import ezmenu
 import pygame
 import game
-
+from settings import settings
 
 class MainMenu:
 
@@ -16,7 +16,7 @@ class MainMenu:
         self.menu.set_highlight_color((255, 0, 0))
         self.menu.set_normal_color((255, 255, 255))
         self.menu.center_at(400, 300)
-        self.menu.set_font(pygame.font.SysFont('lobster', 24))
+        self.menu.set_font(pygame.font.Font(settings['font'], 60))
 
         self.clock = pygame.time.Clock()
 

@@ -9,7 +9,10 @@ SPRITE_IMAGE_FILENAME = "images/spider.png"
 
 
 class Spider(Entity):
+
     SPEED = 100
+    SCORE = 500
+
     def __init__(self, world):
         sprite = pygame.image.load(SPRITE_IMAGE_FILENAME).convert_alpha()
         super(Spider, self).__init__(world, 'Spider', sprite)

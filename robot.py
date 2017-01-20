@@ -10,6 +10,8 @@ SCREEN_SIZE = (800, 600)
 
 class Robot(Entity):
     SPEED = 100
+    SCORE = 100
+
     def __init__(self, world):
         sprite = pygame.image.load(ROBOT_IMAGE_FILENAME).convert_alpha()
         super(Robot, self).__init__(world, 'Robot', sprite)

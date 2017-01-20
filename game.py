@@ -8,6 +8,7 @@ from world import World
 from os import remove as os_remove
 from PIL import Image, ImageFilter
 from settings import settings
+from constants import ENEMY_DESTROYED_EVENT
 
 
 # TODO move this to a unique source
@@ -26,6 +27,7 @@ class Game:
         pygame.mixer.music.set_endevent(Game.SONG_END)
         pygame.mixer.music.play(1)
 
+        self.score = 0
 
         self.clock = pygame.time.Clock()
 
@@ -38,6 +40,8 @@ class Game:
         self.images= dict()
         self.images['life'] = pygame.image.load(LIFE_IMAGE_FILENAME).convert_alpha()
 
+        if pygame.font.get_init():
+            self.font = pygame.font.Font(settings['font'], 80)
 
         self.robots_created = 0
         for _ in xrange(5):
@@ -67,11 +71,18 @@ class Game:
                 if event.type == Game.SONG_END and not settings['debug']:
                     pygame.mixer.music.load('music/main.wav')
                     pygame.mixer.music.play(-1)
+                if event.type == ENEMY_DESTROYED_EVENT:
+                    try:
+                        self.score += event.enemy_class.SCORE
+                    except AttributeError:
+                        pass  # no score
             self.world.process_events(events)
             seconds_passed = self.clock.tick(60) / 1000.0
             should_quit = self.world.process(seconds_passed)
             self.world.render(self.screen)
-            self.render()
+
+            if not should_quit:
+                self.render()
             pygame.display.update()
 
         # Quit game
@@ -85,6 +96,18 @@ class Game:
             x = self.images['life'].get_width() * i + 5 * (i + 1)
             self.screen.blit(self.images['life'], (x, 10))
 
+        # Render score
+        self._render_surface_score()
+
+    def _render_surface_score(self, prefix=''):
+        try:
+            surface = self.font.render(prefix + str(self.score), True, (255,255,255))
+            if surface:
+                # TODO height of this font is pretty weird, can manage to render it with a vertical margin of 10
+                self.screen.blit(surface, (800 - surface.get_width() - 10, 0))
+        except AttributeError:
+            return None  # not font subsystem available
+
     def show_game_over(self):
         filename = 'gameover.jpg'
         pygame.image.save(self.screen, filename)
@@ -92,6 +115,10 @@ class Game:
         im = im.filter(ImageFilter.BLUR)
         im.save(filename)
         self.screen.blit(pygame.image.load(filename), (0, 0))
+
+        # Render Score
+        self._render_surface_score('Max score: ')
+
         os_remove(filename)
         pygame.display.update()
         pygame.time.delay(500)
