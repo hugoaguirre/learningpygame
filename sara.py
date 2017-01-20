@@ -21,9 +21,13 @@ class Sara(Entity):
         self.animation = 0
         self.animation_time = 0
         self.moving = False
+        self.passable = False
+        self.can_leave_screen = False
 
         # Weapon init
         self.weapon = Weapon(self, world)
+
+        self.life = 3
 
     def process_events(self, events):
         pressed_keys = pygame.key.get_pressed()
@@ -49,8 +53,6 @@ class Sara(Entity):
             direction.x * self.speed,
             direction.y * self.speed)
 
-        self.keep_inside_screen()
-
         for event in events:
             if (event.type == pygame.KEYDOWN and
                 event.key == pygame.K_SPACE):
@@ -69,7 +71,6 @@ class Sara(Entity):
                 self.animation = 1
             if self.animation_time == 0:
                 self.animation += -2 if self.animation == 3 else 1
-#                self.image = self.spritesheet.get_image(self.animation)
                 self.animation_time = self.ANIMATION_TICKS
             else:
                 self.animation_time -= 1

@@ -2,6 +2,7 @@ from vector import Vector
 import pygame
 from random import choice as random_choice
 from spritesheet import Spritesheet
+from settings import settings
 
 # TODO DRY
 SCREEN_SIZE = (800, 600)
@@ -43,14 +44,14 @@ class World:
                 if collisions:
                     self.entities['all'].remove(enemy)
                     self.entities['enemies'].remove(enemy)
-        if self.entities.get('enemy_shots'):
+        if self.entities.get('enemy_shots') and not settings['debug']:
             for player in self.entities['player']:
                 collisions = pygame.sprite.spritecollide(player, self.entities['enemy_shots'], True)
                 if collisions:
-                    self.entities['all'].remove(player)
-                    self.entities['events'].remove(player)
-                    self.entities['player'].remove(player)
-                    return True
+                    player.life -= 1
+                    if player.life == 0:
+                        player.kill()
+                        return True  # should quit?
         return False
 
     def render(self, surface):
@@ -78,3 +79,7 @@ class World:
 
     def get_player(self):
         return self.entities['player'].sprites()[0]
+
+    def get_impassable_entities(self, but_me=None):
+        return [entity for entity in self.entities['all'] if not entity.passable and entity is not but_me]
+
