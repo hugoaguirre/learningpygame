@@ -76,3 +76,6 @@ class World:
 
         for entity in self.entities['events']:
             entity.process_events(events)
+
+    def get_impassable_entities(self, but_me=None):
+        return [entity for entity in self.entities['all'] if not entity.passable and entity is not but_me]

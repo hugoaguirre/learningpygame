@@ -38,10 +38,10 @@ class Game:
         self.images= dict()
         self.images['life'] = pygame.image.load(LIFE_IMAGE_FILENAME).convert_alpha()
 
+
         self.robots_created = 0
-        self.create_robot()
-        self.create_robot()
-        self.create_robot()
+        for _ in xrange(5):
+            self.create_robot()
 
         self.main()
 
@@ -98,7 +98,14 @@ class Game:
 
     def create_robot(self):
         robot = Robot(self.world)
-        robot.set_location(randint(0, SCREEN_SIZE[0]), randint(0, SCREEN_SIZE[1]))
+        # 150px is just in front of sara
+        robot.set_location(randint(150, SCREEN_SIZE[0]), randint(0, SCREEN_SIZE[1]))
+        # Really lazy way to prevent collition at init
+        # see Entity.move()
+        while robot.is_colliding_with_impassable_entities():
+            print 'collide at init'
+            robot.set_location(randint(150, SCREEN_SIZE[0]), randint(0, SCREEN_SIZE[1]))
+
         self.world.add_entity(robot, ('enemies', ))
         self.robots_created += 1
 
