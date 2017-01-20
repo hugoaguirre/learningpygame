@@ -61,6 +61,14 @@ class Sara(Entity):
     def fire(self):
         self.weapon.fire()
 
+    def receive_hit(self):
+        '''Perform actions when player receive hit, return boolean
+        indicating if entity should die'''
+
+        self.life -= 1
+        self.flash()
+        return self.life == 0
+
     def move(self, time_passed):
         is_moving = super(Sara, self).move(time_passed)
         if is_moving:
