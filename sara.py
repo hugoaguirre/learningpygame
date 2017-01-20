@@ -28,6 +28,7 @@ class Sara(Entity):
         self.width = self.image.get_width()
         self.height = self.image.get_height()
         self.rect = pygame.Rect(0, 0, self.width, self.height)
+        self.life = 3
 
     def process_events(self, events):
         pressed_keys = pygame.key.get_pressed()

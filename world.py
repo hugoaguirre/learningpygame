@@ -48,10 +48,10 @@ class World:
             for player in self.entities['player']:
                 collisions = pygame.sprite.spritecollide(player, self.entities['enemy_shots'], True)
                 if collisions:
-                    self.entities['all'].remove(player)
-                    self.entities['events'].remove(player)
-                    self.entities['player'].remove(player)
-                    return True
+                    player.life -= 1
+                    if player.life == 0:
+                        player.kill()
+                        return True  # should quit?
         return False
 
     def render(self, surface):
