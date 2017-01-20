@@ -1,3 +1,4 @@
 settings = {
-    'debug': False
+    'debug': False,
+    'font': 'fonts/Game-Over.ttf'
 }
