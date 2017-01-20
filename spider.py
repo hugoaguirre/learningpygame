@@ -104,6 +104,6 @@ class Thunder(Entity):
         if not self.destination:
             self.destination = Vector(
                 self.location.x,
-                self.image.get_height(),
+                self.get_height(),
             )
         super(Thunder, self).process(time_passed)
