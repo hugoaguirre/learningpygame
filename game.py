@@ -12,6 +12,7 @@ from settings import settings
 
 # TODO move this to a unique source
 SCREEN_SIZE = (800, 600)
+LIFE_IMAGE_FILENAME = 'images/heart.png'
 
 
 class Game:
@@ -30,9 +31,12 @@ class Game:
 
         self.world = World()
 
-        sara = Sara(self.world)
-        sara.set_location(100, SCREEN_SIZE[1] / 2)
-        self.world.add_entity(sara, ('events', 'player'))
+        self.sara = Sara(self.world)
+        self.sara.set_location(100, SCREEN_SIZE[1] / 2)
+        self.world.add_entity(self.sara, ('events', 'player'))
+
+        self.images= dict()
+        self.images['life'] = pygame.image.load(LIFE_IMAGE_FILENAME).convert_alpha()
 
         self.robots_created = 0
         self.create_robot()
@@ -67,12 +71,19 @@ class Game:
             seconds_passed = self.clock.tick(60) / 1000.0
             should_quit = self.world.process(seconds_passed)
             self.world.render(self.screen)
+            self.render()
             pygame.display.update()
 
         # Quit game
         self.show_game_over()
 
         menu.MainMenu(self.screen)
+
+    def render(self):
+        '''Use it to render HUD'''
+        for i in xrange(0, self.sara.life):
+            x = self.images['life'].get_width() * i + 5 * (i + 1)
+            self.screen.blit(self.images['life'], (x, 10))
 
     def show_game_over(self):
         filename = 'gameover.jpg'
