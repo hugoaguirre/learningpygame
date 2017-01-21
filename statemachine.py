@@ -6,12 +6,12 @@ class StateMachine(object):
     def add_state(self, state):
         self.states[state.name] = state
 
-    def think(self):
+    def think(self, time_passed):
         if self.active_state is None:
             return
         self.active_state.do_actions()
 
-        new_state_name = self.active_state.check_conditions()
+        new_state_name = self.active_state.check_conditions(time_passed)
         if new_state_name is not None:
             self.set_state(new_state_name)
 
@@ -31,7 +31,7 @@ class State(object):
     def do_actions(self):
         pass
 
-    def do_check_conditions(self):
+    def check_conditions(self, time_passed):
         pass
 
     def entry_actions(self):

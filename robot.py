@@ -3,6 +3,8 @@ from entity import Entity
 from random import randint
 from statemachine import State
 from vector import Vector
+import pyganim
+
 
 SCREEN_SIZE = (800, 600)
 ROBOT_IMAGE_FILENAME = "images/robot.png"
@@ -13,6 +15,10 @@ class Robot(Entity):
     SCORE = 100
 
     def __init__(self, world):
+        images = pyganim.getImagesFromSpriteSheet('images/anirobot.png', rows=1, cols=3, rects=[])
+        frames = list(zip(images, [200, 200, 200]))
+        self.animObj = pyganim.PygAnimation(frames)
+        self.animObj.play()
         sprite = pygame.image.load(ROBOT_IMAGE_FILENAME).convert_alpha()
         super(Robot, self).__init__(world, 'Robot', sprite)
         self.passable = False
@@ -31,12 +37,28 @@ class Robot(Entity):
         self.last = pygame.time.get_ticks()
         self.cooldown = 300
 
+    def render(self, surface):
+        x = self.location.x
+        y = self.location.y
+
+        self.animObj.blit(surface, (x, y))
+
     def shoot(self):
         x = self.location.x
         y = self.location.y
         laser = Laser(self.world, flip=self.is_flip())
         laser.set_location(x, y)
         self.world.add_entity(laser, ('enemy_shots', ))
+
+    def flip(self):
+        if not self._is_flip:
+            self._is_flip = True
+            self.animObj.flip(True, False)
+
+    def reverse_flip(self):
+        if self._is_flip:
+            self._is_flip = False
+            self.animObj.flip(True, False)
 
 
 class RobotStateDodging(State):
@@ -61,7 +83,7 @@ class RobotStateDodging(State):
         # just move once and then do nothing
         pass
 
-    def check_conditions(self):
+    def check_conditions(self, time_passed):
         if self.robot._has_collide:
             collision = self.robot._has_collide - self.robot.location
             self._last_time_collided = collision.get_direction()
@@ -93,19 +115,23 @@ class RobotStateShoting(State):
         self.robot.shoot()
         self.has_shot = True
 
-    def check_conditions(self):
+    def check_conditions(self, time_passed):
         if self.has_shot:
             return 'waiting'
         return None
 
 class RobotStateWaiting(State):
+    WAIT = 1  # second
     def __init__(self, robot):
         super(RobotStateWaiting, self).__init__('waiting')
         self.robot = robot
+        self.time_passed = 0
 
-    def check_conditions(self):
-        # do nothing 
-        return 'dodging'
+    def check_conditions(self, time_passed):
+        self.time_passed += time_passed
+        if self.time_passed > self.WAIT:
+            self.time_passed = 0
+            return 'dodging'
 
 
 LASER_IMAGE_FILENAME = 'images/redlaser.png'

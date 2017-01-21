@@ -3,6 +3,8 @@ from vector import Vector
 from entity import Entity
 from spritesheet import Spritesheet
 from weapon import Weapon
+from constants import NEED_RELOAD_EVENT, RELOAD_EVENT
+
 
 BLACK = (0, 0, 0)
 SARA_IMG_FILENAME = 'images/sara.png'
@@ -46,6 +48,8 @@ class Sara(Entity):
 
         if pressed_keys[pygame.K_r]:
             self.weapon.reload()
+            event = pygame.event.Event(RELOAD_EVENT)
+            pygame.event.post(event)
 
         direction.normalize()
 
@@ -59,7 +63,17 @@ class Sara(Entity):
                 self.fire()
 
     def fire(self):
-        self.weapon.fire()
+        if not self.weapon.fire():
+            event = pygame.event.Event(NEED_RELOAD_EVENT)
+            pygame.event.post(event)
+
+    def receive_hit(self):
+        '''Perform actions when player receive hit, return boolean
+        indicating if entity should die'''
+
+        self.life -= 1
+        self.flash()
+        return self.life == 0
 
     def move(self, time_passed):
         is_moving = super(Sara, self).move(time_passed)
