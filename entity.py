@@ -16,7 +16,6 @@ class Entity(pygame.sprite.Sprite):
         if not image:
             self.spritesheet = spritesheet
             image = spritesheet.get_image(0)
-        self._image = image
         self.rect = image.get_rect()
         self.location = Vector(0, 0)
         self.destination = None
@@ -24,9 +23,10 @@ class Entity(pygame.sprite.Sprite):
         self.passable = True  # you can occupy the same space that this entity
         self.can_leave_screen = True
 
-        self._is_flip = False
-        if flip:
-            self.flip()
+        self._image = None
+        self._is_flip = flip
+        self._flash = None
+        self.set_image(image)
 
         self.brain = StateMachine()
 
@@ -46,26 +46,51 @@ class Entity(pygame.sprite.Sprite):
         if self._is_flip:
             self._is_flip = False  # Force flip
             self.flip()
+        self.mask = pygame.mask.from_surface(self._image)
 
     def flip(self):
         if not self._is_flip:
             self._is_flip = True
             self._image = pygame.transform.flip(self._image, True, False)
+            self.mask = pygame.mask.from_surface(self._image)
 
     def reverse_flip(self):
         if self._is_flip:
             self._is_flip = False
             self._image = pygame.transform.flip(self._image, True, False)
+            self.mask = pygame.mask.from_surface(self._image)
 
     def set_location(self, x, y):
         self.location = Vector(x, y)
         self.rect.x = x
         self.rect.y = y
 
+    def flash(self):
+        o = self.mask.outline()
+        s = pygame.Surface((self.get_width(), self.get_height()))
+        s.set_colorkey((0,0,0))
+        pygame.draw.polygon(s,(200,150,150),o,0)
+        self._flash = s
+        self._flash_duration = 5
+
     def render(self, surface):
         x = self.location.x
         y = self.location.y
-        surface.blit(self._image, (x, y))
+
+        if not self._flash:
+            surface.blit(self._image, (x, y))
+        else:
+            surface.blit(self._flash, (x, y))
+            self._flash_duration -= 1
+            if self._flash_duration == 0:
+                self._flash = None
+                o = self.mask.outline()
+
+        # o = self.mask.outline()
+        # s = pygame.Surface((self.get_width(), self.get_height()))
+        # s.set_colorkey((0,0,0))
+        # pygame.draw.lines(s,(200,150,150),1,o)
+        # surface.blit(s, (x, y))
 
     def process(self, time_passed):
         self.brain.think()
@@ -111,5 +136,5 @@ class Entity(pygame.sprite.Sprite):
 
     def is_colliding_with_impassable_entities(self):
         entities = self.world.get_impassable_entities(but_me=self)
-        collisions = pygame.sprite.spritecollide(self, entities, False)
+        collisions = pygame.sprite.spritecollide(self, entities, False, pygame.sprite.collide_mask)
         return len(collisions) != 0
