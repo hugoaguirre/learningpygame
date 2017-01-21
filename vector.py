@@ -26,6 +26,9 @@ class Vector(object):
             self.x /= magnitude
             self.y /= magnitude
 
+    def get_direction(self):
+        return (-1 if self.x < 0 else 1, -1 if self.y < 0 else 1)
+
     def __add__(self, rhs):  # right hand side
         return Vector(self.x + rhs.x, self.y + rhs.y)
 

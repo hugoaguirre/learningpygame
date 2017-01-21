@@ -31,6 +31,7 @@ class Entity(pygame.sprite.Sprite):
         self.brain = StateMachine()
 
         self.id = 0
+        self._has_collide = None
 
     def is_flip(self):
         return self._is_flip
@@ -72,6 +73,7 @@ class Entity(pygame.sprite.Sprite):
         self.move(time_passed)
 
     def move(self, time_passed):
+        self._has_collide = None
         if self.speed > 0 and self.location != self.destination:
             if not self.can_leave_screen:
                 self.keep_inside_screen()
@@ -89,6 +91,7 @@ class Entity(pygame.sprite.Sprite):
 
             # cancel movement
             if not self.passable and self.is_colliding_with_impassable_entities():
+                self._has_collide = self.destination
                 # because movement is interrupted can be defined as a float, which may lead to troubles
                 self.set_location(int(old_location.x), int(old_location.y))
                 self.destination = self.location
