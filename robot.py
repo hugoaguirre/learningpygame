@@ -65,17 +65,29 @@ class RobotStateDodging(State):
     def __init__(self, robot):
         super(RobotStateDodging, self).__init__('dodging')
         self.robot = robot
+        self._last_time_collided = None
 
-    def random_destination(self):
+    def random_destination(self,but=None):
         x = self.robot.location.x
         y = self.robot.location.y
-        self.robot.destination = Vector(randint(x-200, x+200), randint(y-200, y + 200))
+        range_x = [-200, 200]
+        range_y = [-200, 200]
+
+        if but:
+            range_x[0 if but[0] < 0 else 1] = 0
+            range_y[0 if but[1] < 0 else 1] = 0
+
+        self.robot.destination = Vector(randint(x+range_x[0], x+range_x[1]), randint(y+range_y[0], y + range_y[1]))
 
     def do_actions(self):
         # just move once and then do nothing
         pass
 
     def check_conditions(self, time_passed):
+        if self.robot._has_collide:
+            collision = self.robot._has_collide - self.robot.location
+            self._last_time_collided = collision.get_direction()
+
         sara = self.robot.world.get_player()
 
         if sara.location.x < self.robot.location.x:
@@ -90,7 +102,8 @@ class RobotStateDodging(State):
 
     def entry_actions(self):
         self.robot.speed = Robot.SPEED + randint(-20, -20)
-        self.random_destination()
+        self.random_destination(but=self._last_time_collided)
+        self._last_time_collided = None
 
 class RobotStateShoting(State):
     def __init__(self, robot):

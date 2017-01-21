@@ -66,7 +66,7 @@ class Game:
                         enemy_creator()
 
             # Adding enemies
-            if self.robots_created == 5:
+            if self.score == 500:
                 possible_enemies[30] = self.create_spider
 
             events = pygame.event.get()
