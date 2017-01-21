@@ -113,3 +113,8 @@ class Entity(pygame.sprite.Sprite):
         entities = self.world.get_impassable_entities(but_me=self)
         collisions = pygame.sprite.spritecollide(self, entities, False)
         return len(collisions) != 0
+
+    def get_middle(self):
+        x = self.location.x + self.get_width() / 2
+        y = self.location.y + self.get_height() / 2
+        return (x, y)
