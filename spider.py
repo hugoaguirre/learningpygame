@@ -57,7 +57,7 @@ class SpiderStateDodging(State):
         # just move once and then do nothing
         pass
 
-    def check_conditions(self):
+    def check_conditions(self, time_passed):
         if (self.spider.location.x == float(self.spider.destination.x) and
             self.spider.location.y == float(self.spider.destination.y)):
             return 'shoting'
@@ -77,7 +77,7 @@ class SpiderStateShoting(State):
         self.has_shot = True
         self.spider.kill()
 
-    def check_conditions(self):
+    def check_conditions(self, time_passed):
         if self.has_shot:
             return 'waiting'
         return None
@@ -87,7 +87,7 @@ class SpiderStateWaiting(State):
         super(SpiderStateWaiting, self).__init__('waiting')
         self.robot = robot
 
-    def check_conditions(self):
+    def check_conditions(self, time_passed):
         # do nothing 
         return 'dodging'
 

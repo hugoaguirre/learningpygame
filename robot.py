@@ -4,6 +4,7 @@ from random import randint
 from statemachine import State
 from vector import Vector
 import sfx
+import pyganim
 
 
 SCREEN_SIZE = (800, 600)
@@ -15,6 +16,10 @@ class Robot(Entity):
     SCORE = 100
 
     def __init__(self, world):
+        images = pyganim.getImagesFromSpriteSheet('images/anirobot.png', rows=1, cols=3, rects=[])
+        frames = list(zip(images, [200, 200, 200]))
+        self.animObj = pyganim.PygAnimation(frames)
+        self.animObj.play()
         sprite = pygame.image.load(ROBOT_IMAGE_FILENAME).convert_alpha()
         super(Robot, self).__init__(world, 'Robot', sprite)
         self.passable = False
@@ -33,6 +38,12 @@ class Robot(Entity):
         self.last = pygame.time.get_ticks()
         self.cooldown = 300
 
+    def render(self, surface):
+        x = self.location.x
+        y = self.location.y
+
+        self.animObj.blit(surface, (x, y))
+
     def shoot(self):
         x = self.location.x
         y = self.location.y
@@ -41,22 +52,44 @@ class Robot(Entity):
         self.world.add_entity(laser, ('enemy_shots', ))
         sfx.play_laser()
 
+    def flip(self):
+        if not self._is_flip:
+            self._is_flip = True
+            self.animObj.flip(True, False)
+
+    def reverse_flip(self):
+        if self._is_flip:
+            self._is_flip = False
+            self.animObj.flip(True, False)
+
 
 class RobotStateDodging(State):
     def __init__(self, robot):
         super(RobotStateDodging, self).__init__('dodging')
         self.robot = robot
+        self._last_time_collided = None
 
-    def random_destination(self):
+    def random_destination(self,but=None):
         x = self.robot.location.x
         y = self.robot.location.y
-        self.robot.destination = Vector(randint(x-200, x+200), randint(y-200, y + 200))
+        range_x = [-200, 200]
+        range_y = [-200, 200]
+
+        if but:
+            range_x[0 if but[0] < 0 else 1] = 0
+            range_y[0 if but[1] < 0 else 1] = 0
+
+        self.robot.destination = Vector(randint(x+range_x[0], x+range_x[1]), randint(y+range_y[0], y + range_y[1]))
 
     def do_actions(self):
         # just move once and then do nothing
         pass
 
-    def check_conditions(self):
+    def check_conditions(self, time_passed):
+        if self.robot._has_collide:
+            collision = self.robot._has_collide - self.robot.location
+            self._last_time_collided = collision.get_direction()
+
         sara = self.robot.world.get_player()
 
         if sara.location.x < self.robot.location.x:
@@ -71,7 +104,8 @@ class RobotStateDodging(State):
 
     def entry_actions(self):
         self.robot.speed = Robot.SPEED + randint(-20, -20)
-        self.random_destination()
+        self.random_destination(but=self._last_time_collided)
+        self._last_time_collided = None
 
 class RobotStateShoting(State):
     def __init__(self, robot):
@@ -83,19 +117,23 @@ class RobotStateShoting(State):
         self.robot.shoot()
         self.has_shot = True
 
-    def check_conditions(self):
+    def check_conditions(self, time_passed):
         if self.has_shot:
             return 'waiting'
         return None
 
 class RobotStateWaiting(State):
+    WAIT = 1  # second
     def __init__(self, robot):
         super(RobotStateWaiting, self).__init__('waiting')
         self.robot = robot
+        self.time_passed = 0
 
-    def check_conditions(self):
-        # do nothing 
-        return 'dodging'
+    def check_conditions(self, time_passed):
+        self.time_passed += time_passed
+        if self.time_passed > self.WAIT:
+            self.time_passed = 0
+            return 'dodging'
 
 
 LASER_IMAGE_FILENAME = 'images/redlaser.png'

@@ -2,6 +2,7 @@ import sfx
 
 from bullet import Bullet
 
+
 class Weapon():
 
     def __init__(self, player, world):
@@ -22,11 +23,12 @@ class Weapon():
         x = self.player.location.x + (0 if self.player.is_flip() else self.player.get_width())
         y = self.player.location.y + self.player.get_height() / 2
 
-        if self.bullets_fired < self.magazine_size:
+        if self.bullets_fired <= self.magazine_size:
             bullet = Bullet(self.world, flip=self.player.is_flip())
             bullet.set_location(x, y)
             self.bullets_fired += 1
             self.world.add_entity(bullet, ('ally_shots', ))
             sfx.play_laser2()
+            return True
         else:
-            print 'no ammo'
+            return False
