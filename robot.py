@@ -3,6 +3,8 @@ from entity import Entity
 from random import randint
 from statemachine import State
 from vector import Vector
+import sfx
+
 
 SCREEN_SIZE = (800, 600)
 ROBOT_IMAGE_FILENAME = "images/robot.png"
@@ -37,6 +39,7 @@ class Robot(Entity):
         laser = Laser(self.world, flip=self.is_flip())
         laser.set_location(x, y)
         self.world.add_entity(laser, ('enemy_shots', ))
+        sfx.play_laser()
 
 
 class RobotStateDodging(State):

@@ -4,6 +4,7 @@ from entity import Entity
 from spritesheet import Spritesheet
 from weapon import Weapon
 
+
 BLACK = (0, 0, 0)
 SARA_IMG_FILENAME = 'images/sara.png'
 LASER_IMG_FILENAME = "images/laser.png"
