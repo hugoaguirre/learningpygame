@@ -8,12 +8,13 @@ from world import World
 from os import remove as os_remove
 from PIL import Image, ImageFilter
 from settings import settings
-from constants import ENEMY_DESTROYED_EVENT
+from constants import ENEMY_DESTROYED_EVENT, NEED_RELOAD_EVENT, RELOAD_EVENT
 
 
 # TODO move this to a unique source
 SCREEN_SIZE = (800, 600)
 LIFE_IMAGE_FILENAME = 'images/heart.png'
+RELOAD_BUTTON_IMAGE_FILENAME = 'images/button_r.png'
 
 
 class Game:
@@ -39,6 +40,8 @@ class Game:
 
         self.images= dict()
         self.images['life'] = pygame.image.load(LIFE_IMAGE_FILENAME).convert_alpha()
+        self.images['reload'] = pygame.image.load(RELOAD_BUTTON_IMAGE_FILENAME).convert_alpha()
+        self.show_reload = False
 
         if pygame.font.get_init():
             self.font = pygame.font.Font(settings['font'], 80)
@@ -76,6 +79,10 @@ class Game:
                         self.score += event.enemy_class.SCORE
                     except AttributeError:
                         pass  # no score
+                if event.type == NEED_RELOAD_EVENT:
+                    self.show_reload = True
+                if event.type == RELOAD_EVENT:
+                    self.show_reload = False
             self.world.process_events(events)
             seconds_passed = self.clock.tick(60) / 1000.0
             should_quit = self.world.process(seconds_passed)
@@ -98,6 +105,13 @@ class Game:
 
         # Render score
         self._render_surface_score()
+
+        # Render reload
+        if self.show_reload:
+            sara_middle = self.sara.get_middle()
+            x = sara_middle[0] - self.images['reload'].get_width() / 2
+            y = self.sara.location.y - self.images['reload'].get_height() - 10
+            self.screen.blit(self.images['reload'], (x, y))
 
     def _render_surface_score(self, prefix=''):
         try:
