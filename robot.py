@@ -3,6 +3,7 @@ from entity import Entity
 from random import randint
 from statemachine import State
 from vector import Vector
+import sfx
 import pyganim
 
 
@@ -49,6 +50,7 @@ class Robot(Entity):
         laser = Laser(self.world, flip=self.is_flip())
         laser.set_location(x, y)
         self.world.add_entity(laser, ('enemy_shots', ))
+        sfx.play_laser()
 
     def flip(self):
         if not self._is_flip:

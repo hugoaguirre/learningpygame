@@ -6,6 +6,7 @@ from weapon import Weapon
 from constants import NEED_RELOAD_EVENT, RELOAD_EVENT
 
 
+
 BLACK = (0, 0, 0)
 SARA_IMG_FILENAME = 'images/sara.png'
 LASER_IMG_FILENAME = "images/laser.png"

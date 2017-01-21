@@ -1,4 +1,5 @@
-import pygame
+import sfx
+
 from bullet import Bullet
 
 
@@ -27,6 +28,7 @@ class Weapon():
             bullet.set_location(x, y)
             self.bullets_fired += 1
             self.world.add_entity(bullet, ('ally_shots', ))
+            sfx.play_laser2()
             return True
         else:
             return False
