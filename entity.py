@@ -93,7 +93,7 @@ class Entity(pygame.sprite.Sprite):
         # surface.blit(s, (x, y))
 
     def process(self, time_passed):
-        self.brain.think()
+        self.brain.think(time_passed)
         self.move(time_passed)
 
     def move(self, time_passed):
