@@ -4,6 +4,7 @@ import pygame
 import game
 from settings import settings
 
+
 class MainMenu:
 
     def __init__(self, screen):

@@ -1,56 +1,59 @@
 import pygame
+import pyganim
+from os.path import join as path_join
+
 from entity import Entity
 from random import randint
-from statemachine import State
+from statemachine import StateMachine, State
 from vector import Vector
-import sfx
-import pyganim
+from sfx import play_laser
+from constants import SCREEN_SIZE
 
-
-SCREEN_SIZE = (800, 600)
-ROBOT_IMAGE_FILENAME = "images/robot.png"
-SCREEN_SIZE = (800, 600)
 
 class Robot(Entity):
     SPEED = 100
     SCORE = 100
+    IMAGE_FILENAME = path_join("images", "robot.png")
 
-    def __init__(self, world):
-        images = pyganim.getImagesFromSpriteSheet('images/anirobot.png', rows=1, cols=3, rects=[])
+    def __init__(self, world, location=(0, 0)):
+        # FIX integrate pyganim as part on entity
+        images = pyganim.getImagesFromSpriteSheet(path_join('images', 'anirobot.png'), rows=1, cols=3, rects=[])
         frames = list(zip(images, [200, 200, 200]))
         self.animObj = pyganim.PygAnimation(frames)
         self.animObj.play()
-        sprite = pygame.image.load(ROBOT_IMAGE_FILENAME).convert_alpha()
-        super(Robot, self).__init__(world, 'Robot', sprite)
-        self.passable = False
-        self.can_leave_screen = False
 
+        sprite = pygame.image.load(Robot.IMAGE_FILENAME).convert_alpha()
+
+        super(Robot, self).__init__(
+            world, 'Robot', sprite,
+            passable=False,
+            can_leave_screen=False,
+            brain=self._build_brain(),
+            location=location)
+
+    def _build_brain(self):
+        brain = StateMachine()
         shoting_state = RobotStateShoting(self)
         waiting_state = RobotStateWaiting(self)
         dodging_state = RobotStateDodging(self)
 
-        self.brain.add_state(shoting_state)
-        self.brain.add_state(waiting_state)
-        self.brain.add_state(dodging_state)
+        brain.add_state(shoting_state)
+        brain.add_state(waiting_state)
+        brain.add_state(dodging_state)
 
-        self.brain.set_state('waiting')
-
-        self.last = pygame.time.get_ticks()
-        self.cooldown = 300
+        brain.set_state('waiting')
+        return brain
 
     def render(self, surface):
-        x = self.location.x
-        y = self.location.y
-
-        self.animObj.blit(surface, (x, y))
+        location = self.get_location()
+        self.animObj.blit(surface, (location.x, location.y))
 
     def shoot(self):
-        x = self.location.x
-        y = self.location.y
+        location = self.get_location()
         laser = Laser(self.world, flip=self.is_flip())
-        laser.set_location(x, y)
+        laser.set_location(location)
         self.world.add_entity(laser, ('enemy_shots', ))
-        sfx.play_laser()
+        play_laser()
 
     def flip(self):
         if not self._is_flip:
@@ -69,9 +72,8 @@ class RobotStateDodging(State):
         self.robot = robot
         self._last_time_collided = None
 
-    def random_destination(self,but=None):
-        x = self.robot.location.x
-        y = self.robot.location.y
+    def random_destination(self, but=None):
+        location = self.robot.get_location()
         range_x = [-200, 200]
         range_y = [-200, 200]
 
@@ -79,33 +81,40 @@ class RobotStateDodging(State):
             range_x[0 if but[0] < 0 else 1] = 0
             range_y[0 if but[1] < 0 else 1] = 0
 
-        self.robot.destination = Vector(randint(x+range_x[0], x+range_x[1]), randint(y+range_y[0], y + range_y[1]))
+        self.robot.set_destination(Vector(
+            randint(location.x + range_x[0], location.x + range_x[1]),
+            randint(location.y + range_y[0], location.y + range_y[1])
+        ))
 
     def do_actions(self):
         # just move once and then do nothing
         pass
 
     def check_conditions(self, time_passed):
+        robot_location = self.robot.get_location()
         if self.robot._has_collide:
-            collision = self.robot._has_collide - self.robot.location
+            collision = self.robot._has_collide - robot_location
             self._last_time_collided = collision.get_direction()
 
         sara = self.robot.world.get_player()
 
-        if sara.location.x < self.robot.location.x:
+        sara_location = sara.get_location()
+        if sara_location.x < robot_location.x:
             self.robot.flip()
         else:
             self.robot.reverse_flip()
 
-        if (self.robot.location.x == float(self.robot.destination.x) and
-            self.robot.location.y == float(self.robot.destination.y)):
+        robot_destination = self.robot.get_destination()
+        if (robot_location.x == float(robot_destination.x) and
+            robot_location.y == float(robot_destination.y)):
             return 'shoting'
         return None
 
     def entry_actions(self):
-        self.robot.speed = Robot.SPEED + randint(-20, -20)
+        self.robot.set_speed(Robot.SPEED + randint(-20, 20))
         self.random_destination(but=self._last_time_collided)
         self._last_time_collided = None
+
 
 class RobotStateShoting(State):
     def __init__(self, robot):
@@ -122,8 +131,10 @@ class RobotStateShoting(State):
             return 'waiting'
         return None
 
+
 class RobotStateWaiting(State):
     WAIT = 1  # second
+
     def __init__(self, robot):
         super(RobotStateWaiting, self).__init__('waiting')
         self.robot = robot
@@ -136,19 +147,24 @@ class RobotStateWaiting(State):
             return 'dodging'
 
 
-LASER_IMAGE_FILENAME = 'images/redlaser.png'
 class Laser(Entity):
 
+    SPEED = 600
+    IMAGE_FILENAME = path_join('images', 'redlaser.png')
+
     def __init__(self, world, flip=False):
-        sprite = pygame.image.load(LASER_IMAGE_FILENAME).convert_alpha()
-        super(Laser, self).__init__(world, 'laser', sprite, flip=flip)
-        self.speed = 600
+        sprite = pygame.image.load(Laser.IMAGE_FILENAME).convert_alpha()
+        super(Laser, self).__init__(
+            world, 'laser', sprite,
+            flip=flip,
+            speed=Laser.SPEED
+        )
 
     def process(self, time_passed):
-        if not self.destination:
+        if not self.get_destination():
             x = 0 - self.get_width() if self.is_flip() else SCREEN_SIZE[0] + self.get_width()
-            self.destination = Vector(
+            self.set_destination(Vector(
                 x,
-                self.location.y
-            )
+                self.get_location().y
+            ))
         super(Laser, self).process(time_passed)

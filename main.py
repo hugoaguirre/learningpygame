@@ -6,16 +6,19 @@ from settings import settings
 
 SCREEN_SIZE = (800, 600)
 
+
 def init_screen():
     pygame.init()
     pygame.mouse.set_visible(0)
     pygame.display.set_caption('Sara\'s shooter')
     return pygame.display.set_mode(SCREEN_SIZE)
 
+
 def parse_args():
     parser = argparse.ArgumentParser(description='Sara is shooting some robots')
     parser.add_argument('--debug', help='Useful for debugging purposes', default=False, action='store_true')
     return parser.parse_args()
+
 
 def main():
     args = parse_args()

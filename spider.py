@@ -1,7 +1,7 @@
 import pygame
 from entity import Entity
 from random import randint
-from statemachine import State
+from statemachine import StateMachine, State
 from vector import Vector
 
 
@@ -15,28 +15,27 @@ class Spider(Entity):
 
     def __init__(self, world):
         sprite = pygame.image.load(SPRITE_IMAGE_FILENAME).convert_alpha()
-        super(Spider, self).__init__(world, 'Spider', sprite)
-        self.speed = Spider.SPEED
-        self.destination = self.location
+        super(Spider, self).__init__(
+            world, 'Spider', sprite,
+            brain=self._build_brain(),
+            speed=Spider.SPEED,
+        )
 
-        shoting_state = SpiderStateShoting(self)
-        waiting_state = SpiderStateWaiting(self)
-        dodging_state = SpiderStateDodging(self)
+        self.set_destination(self.get_location())
 
-        self.brain.add_state(shoting_state)
-        self.brain.add_state(waiting_state)
-        self.brain.add_state(dodging_state)
+    def _build_brain(self):
+        brain = StateMachine()
 
-        self.brain.set_state('dodging')
+        brain.add_state(SpiderStateShoting(self))
+        brain.add_state(SpiderStateWaiting(self))
+        brain.add_state(SpiderStateDodging(self))
 
-        self.last = pygame.time.get_ticks()
-        self.cooldown = 300
+        brain.set_state('waiting')
+        return brain
 
     def shoot(self):
-        x = self.location.x + 31
-        y = self.location.y + 34
         thunder = Thunder(self.world)
-        thunder.set_location(x, y)
+        thunder.set_location(self.get_location() + Vector(31, 34))
         self.world.add_entity(thunder, ('enemy_shots', ))
 
     def __del__(self):
@@ -49,8 +48,8 @@ class SpiderStateDodging(State):
         self.spider = spider
 
     def random_destination(self):
-        x = int(self.spider.location.x)
-        self.spider.destination = Vector(randint(x-200, x+200), 1)  # Always on top
+        x = int(self.spider.get_location().x)
+        self.spider.set_destination(Vector(randint(x-200, x+200), 1))  # Always on top
         self.spider.keep_inside_screen()
 
     def do_actions(self):
@@ -58,13 +57,16 @@ class SpiderStateDodging(State):
         pass
 
     def check_conditions(self, time_passed):
-        if (self.spider.location.x == float(self.spider.destination.x) and
-            self.spider.location.y == float(self.spider.destination.y)):
+        spider_location = self.spider.get_location()
+        spider_destination = self.spider.get_destination()
+        if (spider_location.x == float(spider_destination.x) and
+            spider_location.y == float(spider_destination.y)):
             return 'shoting'
         return None
 
     def entry_actions(self):
         self.random_destination()
+
 
 class SpiderStateShoting(State):
     def __init__(self, spider):
@@ -82,28 +84,30 @@ class SpiderStateShoting(State):
             return 'waiting'
         return None
 
+
 class SpiderStateWaiting(State):
     def __init__(self, robot):
         super(SpiderStateWaiting, self).__init__('waiting')
         self.robot = robot
 
     def check_conditions(self, time_passed):
-        # do nothing 
+        # do nothing
         return 'dodging'
 
 
-THUNDER_IMAGE_FILENAME = 'images/thunder.png'
 class Thunder(Entity):
 
+    SPEED = 1200
+    IMAGE_FILENAME = 'images/thunder.png'
+
     def __init__(self, world):
-        sprite = pygame.image.load(THUNDER_IMAGE_FILENAME).convert_alpha()
-        super(Thunder, self).__init__(world, 'thunder', sprite)
-        self.speed = 1200
+        sprite = pygame.image.load(Thunder.IMAGE_FILENAME).convert_alpha()
+        super(Thunder, self).__init__(world, 'Thunder', sprite, speed=Thunder.SPEED)
 
     def process(self, time_passed):
-        if not self.destination:
-            self.destination = Vector(
-                self.location.x,
+        if not self.get_destination():
+            self.set_destination(Vector(
+                self.get_location().x,
                 self.get_height(),
-            )
+            ))
         super(Thunder, self).process(time_passed)
