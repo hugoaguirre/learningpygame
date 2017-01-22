@@ -1,28 +1,30 @@
 import pygame
+from os.path import join as path_join
 
 from vector import Vector
 from entity import Entity
+from constants import SCREEN_SIZE, COLOR_BLACK
 
-# TODO: Create game_settings.py file
-BLACK = (0, 0, 0)
-LASER_IMG_FILENAME = "images/laser.png"
-SCREEN_SIZE = (800, 600)
 
 class Bullet(Entity):
-    """ Make the bullets independant 
-        Make the bullets great again """
+    """ Make the bullets independant"""
 
-    def __init__(self, world, flip=False):
+    SPEED = 300
+    IMAGE_FILENAME = path_join("images", "laser.png")
 
-        sprite = pygame.image.load(LASER_IMG_FILENAME).convert()
-        sprite.set_colorkey(BLACK)
-        super(Bullet, self).__init__(world, 'bulllet', sprite, flip=flip)
+    def __init__(self, world, flip=False, location=None):
+        sprite = pygame.image.load(Bullet.IMAGE_FILENAME).convert()
+        sprite.set_colorkey(COLOR_BLACK)
 
-        # Bullet settings
-        self.speed = 300
+        super(Bullet, self).__init__(
+            world, 'Bullet', sprite,
+            flip=flip,
+            speed=Bullet.SPEED,
+            location=location
+        )
 
     def process(self, time_passed):
-        if not self.destination:
+        if not self.get_destination():
             x = 0 - self.get_width() if self.is_flip() else SCREEN_SIZE[0] + self.get_width()
-            self.destination = Vector(x, self.location.y)
+            self.set_destination(Vector(x, self.get_location().y))
         super(Bullet, self).process(time_passed)

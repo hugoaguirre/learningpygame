@@ -3,10 +3,8 @@ import pygame
 from random import choice as random_choice
 from spritesheet import Spritesheet
 from settings import settings
-from constants import ENEMY_DESTROYED_EVENT
+from constants import ENEMY_DESTROYED_EVENT, SCREEN_SIZE
 
-# TODO DRY
-SCREEN_SIZE = (800, 600)
 
 class World:
     def __init__(self):
@@ -37,8 +35,7 @@ class World:
         return self.detect_collisions()
 
     def detect_collisions(self):
-        if (self.entities.get('enemies') and
-            self.entities.get('ally_shots')):
+        if (self.entities.get('enemies') and self.entities.get('ally_shots')):
             for enemy in self.entities['enemies']:
                 collisions = pygame.sprite.spritecollide(enemy, self.entities['ally_shots'], True, pygame.sprite.collide_mask)
                 if collisions:
@@ -65,7 +62,7 @@ class World:
 
         for entity in self.entities['all']:
             if entity.name == name:
-                distance = location.get_distance_to(entity.location)
+                distance = location.get_distance_to(entity.get_location())
                 if distance < close:
                     return entity
         return None
@@ -82,5 +79,4 @@ class World:
         return self.entities['player'].sprites()[0]
 
     def get_impassable_entities(self, but_me=None):
-        return [entity for entity in self.entities['all'] if not entity.passable and entity is not but_me]
-
+        return [entity for entity in self.entities['all'] if not entity.is_passable() and entity is not but_me]

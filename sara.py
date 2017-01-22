@@ -1,4 +1,6 @@
 import pygame
+from os.path import join as path_join
+
 from vector import Vector
 from entity import Entity
 from spritesheet import Spritesheet
@@ -6,26 +8,25 @@ from weapon import Weapon
 from constants import NEED_RELOAD_EVENT, RELOAD_EVENT
 
 
-
-BLACK = (0, 0, 0)
-SARA_IMG_FILENAME = 'images/sara.png'
-LASER_IMG_FILENAME = "images/laser.png"
-SCREEN_SIZE = (800, 600)
-
-
 class Sara(Entity):
 
+    SPEED = 200
     ANIMATION_TICKS = 12
+    IMAGE_FILENAME = path_join('images', 'sara.png')
 
     def __init__(self, world):
-        ss = Spritesheet(SARA_IMG_FILENAME, 44)
-        super(Sara, self).__init__(world, 'sara', spritesheet=ss)
-        self.speed = 200
+        ss = Spritesheet(Sara.IMAGE_FILENAME, 44)
+        super(Sara, self).__init__(
+            world, 'sara',
+            spritesheet=ss,
+            passable=False,
+            can_leave_screen=False,
+            speed=Sara.SPEED
+        )
+
         self.animation = 0
         self.animation_time = 0
         self.moving = False
-        self.passable = False
-        self.can_leave_screen = False
 
         # Weapon init
         self.weapon = Weapon(self, world)
@@ -54,9 +55,9 @@ class Sara(Entity):
 
         direction.normalize()
 
-        self.destination = self.location + Vector(
-            direction.x * self.speed,
-            direction.y * self.speed)
+        self.set_destination(self.get_location() + Vector(
+            direction.x * self.get_speed(),
+            direction.y * self.get_speed()))
 
         for event in events:
             if (event.type == pygame.KEYDOWN and
@@ -90,7 +91,7 @@ class Sara(Entity):
             else:
                 self.animation_time -= 1
         else:
-            if self.animation in (1, 2, 3): # was just moving
+            if self.animation in (1, 2, 3):  # was just moving
                 self.animation_time = self.ANIMATION_TICKS / 2  # shorter stop animation
                 self.animation = 4
             elif self.animation == 4 and self.animation_time != 0:

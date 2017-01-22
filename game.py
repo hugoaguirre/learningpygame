@@ -1,31 +1,30 @@
 import pygame
+from os import remove as os_remove
+from os.path import join as path_join
+from PIL import Image, ImageFilter
+from random import randint
+
 import menu
-from random import randint, choice as random_choice
 from sara import Sara
 from robot import Robot
 from spider import Spider
 from world import World
-from os import remove as os_remove
-from PIL import Image, ImageFilter
+from vector import Vector
 from settings import settings
-from constants import ENEMY_DESTROYED_EVENT, NEED_RELOAD_EVENT, RELOAD_EVENT
+from constants import ENEMY_DESTROYED_EVENT, NEED_RELOAD_EVENT, RELOAD_EVENT, SCREEN_SIZE, SONG_END_EVENT
 
 
-# TODO move this to a unique source
-SCREEN_SIZE = (800, 600)
-LIFE_IMAGE_FILENAME = 'images/heart.png'
-RELOAD_BUTTON_IMAGE_FILENAME = 'images/button_r.png'
+LIFE_IMAGE_FILENAME = path_join('images', 'heart.png')
+RELOAD_BUTTON_IMAGE_FILENAME = path_join('images', 'button_r.png')
 
 
 class Game:
-    SONG_END = pygame.USEREVENT + 1
-
     def __init__(self, screen):
         self.screen = screen
 
 #        pygame.mixer.pre_init(44100, -16, 2, 1024*4)
         pygame.mixer.music.load("music/intro.wav")
-        pygame.mixer.music.set_endevent(Game.SONG_END)
+        pygame.mixer.music.set_endevent(SONG_END_EVENT)
         pygame.mixer.music.play(1)
 
         self.score = 0
@@ -35,10 +34,10 @@ class Game:
         self.world = World()
 
         self.sara = Sara(self.world)
-        self.sara.set_location(100, SCREEN_SIZE[1] / 2)
+        self.sara.set_location(Vector(100, SCREEN_SIZE[1] / 2))
         self.world.add_entity(self.sara, ('events', 'player'))
 
-        self.images= dict()
+        self.images = dict()
         self.images['life'] = pygame.image.load(LIFE_IMAGE_FILENAME).convert_alpha()
         self.images['reload'] = pygame.image.load(RELOAD_BUTTON_IMAGE_FILENAME).convert_alpha()
         self.show_reload = False
@@ -47,7 +46,7 @@ class Game:
             self.font = pygame.font.Font(settings['font'], 80)
 
         self.robots_created = 0
-        for _ in xrange(5):
+        for _ in xrange(settings['initial_robots']):
             self.create_robot()
 
         self.main()
@@ -71,7 +70,7 @@ class Game:
 
             events = pygame.event.get()
             for event in events:
-                if event.type == Game.SONG_END and not settings['debug']:
+                if event.type == SONG_END_EVENT and not settings['debug']:
                     pygame.mixer.music.load('music/main.wav')
                     pygame.mixer.music.play(-1)
                 if event.type == ENEMY_DESTROYED_EVENT:
@@ -110,12 +109,12 @@ class Game:
         if self.show_reload:
             sara_middle = self.sara.get_middle()
             x = sara_middle[0] - self.images['reload'].get_width() / 2
-            y = self.sara.location.y - self.images['reload'].get_height() - 10
+            y = self.sara.get_location().y - self.images['reload'].get_height() - 10
             self.screen.blit(self.images['reload'], (x, y))
 
     def _render_surface_score(self, prefix=''):
         try:
-            surface = self.font.render(prefix + str(self.score), True, (255,255,255))
+            surface = self.font.render(prefix + str(self.score), True, (255, 255, 255))
             if surface:
                 # TODO height of this font is pretty weird, can manage to render it with a vertical margin of 10
                 self.screen.blit(surface, (800 - surface.get_width() - 10, 0))
@@ -140,17 +139,17 @@ class Game:
     def create_robot(self):
         robot = Robot(self.world)
         # 150px is just in front of sara
-        robot.set_location(randint(150, SCREEN_SIZE[0]), randint(0, SCREEN_SIZE[1]))
+        robot.set_location(Vector(randint(150, SCREEN_SIZE[0]), randint(0, SCREEN_SIZE[1])))
         # Really lazy way to prevent collition at init
         # see Entity.move()
         while robot.is_colliding_with_impassable_entities():
             print 'collide at init'
-            robot.set_location(randint(150, SCREEN_SIZE[0]), randint(0, SCREEN_SIZE[1]))
+            robot.set_location(Vector(randint(150, SCREEN_SIZE[0]), randint(0, SCREEN_SIZE[1])))
 
         self.world.add_entity(robot, ('enemies', ))
         self.robots_created += 1
 
     def create_spider(self):
         spider = Spider(self.world)
-        spider.set_location(200, 1)
+        spider.set_location(Vector(200, 1))
         self.world.add_entity(spider, ('enemies',))

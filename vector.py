@@ -36,7 +36,7 @@ class Vector(object):
         return Vector(self.x - rhs.x, self.y - rhs.y)
 
     def __neg__(self):
-        return Vector(-self.x , -self.y)
+        return Vector(-self.x, -self.y)
 
     def __mul__(self, scalar):
         return Vector(self.x * scalar, self.y * scalar)
