@@ -36,6 +36,7 @@ class Sara(Entity):
     def process_events(self, events):
         pressed_keys = pygame.key.get_pressed()
         direction = Vector(0, 0)
+
         if pressed_keys[pygame.K_LEFT]:
             direction.x = -1
             self.flip()
@@ -48,11 +49,6 @@ class Sara(Entity):
         elif pressed_keys[pygame.K_DOWN]:
             direction.y = +1
 
-        if pressed_keys[pygame.K_r]:
-            self.weapon.reload()
-            event = pygame.event.Event(RELOAD_EVENT)
-            pygame.event.post(event)
-
         direction.normalize()
 
         self.set_destination(self.get_location() + Vector(
@@ -60,9 +56,13 @@ class Sara(Entity):
             direction.y * self.get_speed()))
 
         for event in events:
-            if (event.type == pygame.KEYDOWN and
-                event.key == pygame.K_SPACE):
-                self.fire()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    self.fire()
+                elif event.key == pygame.K_r:
+                    self.weapon.reload()
+                    event = pygame.event.Event(RELOAD_EVENT)
+                    pygame.event.post(event)
 
     def fire(self):
         if not self.weapon.fire():

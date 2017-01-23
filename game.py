@@ -138,13 +138,12 @@ class Game:
 
     def create_robot(self):
         robot = Robot(self.world)
-        # 150px is just in front of sara
-        robot.set_location(Vector(randint(150, SCREEN_SIZE[0]), randint(0, SCREEN_SIZE[1])))
-        # Really lazy way to prevent collition at init
-        # see Entity.move()
+        robot.set_location(Vector(SCREEN_SIZE[0], randint(0, SCREEN_SIZE[1])))
+
         while robot.is_colliding_with_impassable_entities():
-            print 'collide at init'
-            robot.set_location(Vector(randint(150, SCREEN_SIZE[0]), randint(0, SCREEN_SIZE[1])))
+            robot.set_location(
+                Vector(SCREEN_SIZE[0], randint(0, SCREEN_SIZE[1]))
+            )
 
         self.world.add_entity(robot, ('enemies', ))
         self.robots_created += 1

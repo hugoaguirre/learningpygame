@@ -71,20 +71,21 @@ class RobotStateDodging(State):
         super(RobotStateDodging, self).__init__('dodging')
         self.robot = robot
         self._last_time_collided = None
+        self.is_inside_screen = False
 
     def random_destination(self, but=None):
         location = self.robot.get_location()
-        range_x = [-200, 200]
-        range_y = [-200, 200]
+        if location.x < SCREEN_SIZE[0] and location.y < SCREEN_SIZE[1]:
+            self.is_inside_screen = True
+            self.robot.set_can_leave_screen(False)
 
-        if but:
-            range_x[0 if but[0] < 0 else 1] = 0
-            range_y[0 if but[1] < 0 else 1] = 0
+        if not self.is_inside_screen:
+            self.robot.set_can_leave_screen(True)
 
+        # Keep him inside screen
         self.robot.set_destination(Vector(
-            randint(location.x + range_x[0], location.x + range_x[1]),
-            randint(location.y + range_y[0], location.y + range_y[1])
-        ))
+            randint(SCREEN_SIZE[0]//2, SCREEN_SIZE[0]),
+            randint(0, SCREEN_SIZE[1])))
 
     def do_actions(self):
         # just move once and then do nothing
