@@ -74,6 +74,7 @@ class RobotStateDodging(State):
 
     def random_destination(self, but=None):
         location = self.robot.get_location()
+        location.x, location.y = int(location.x), int(location.y)
         range_x = [-200, 200]
         range_y = [-200, 200]
 
