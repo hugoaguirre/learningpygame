@@ -17,6 +17,14 @@ class World:
         self.map_surface = mapRender.get_surface()
         self.add_entity(mapRender.get_blocker_entities(), ('blocker'))
 
+        # parallax this
+        basement = mapRender.map_data.get_layer_by_name('basement')
+        self.basement = {
+            'image': pygame.image.load(basement.source.replace('../', '')),
+            'x': 800,
+            'y': 650,  #int(basement.offsety)
+        }
+
         self.viewport = pygame.Rect((0, 0), SCREEN_SIZE)
         self.level_surface = pygame.Surface(mapRender.get_size())
 
@@ -58,9 +66,19 @@ class World:
     def render(self, surface):
         player = self.get_player()
         if player:
+            old_left = self.viewport.left
+            old_top = self.viewport.top
             self.viewport.center = player.rect.center
             self.viewport.clamp_ip(self.level_surface.get_rect())
+            diff_left = self.viewport.left - old_left
+            diff_top = self.viewport.top - old_top
+            self.basement['x'] += int(diff_left * 0.3)
+            self.basement['y'] += int(diff_top * 0.3)
 
+        self.level_surface.blit(
+            self.basement['image'],
+            (self.basement['x'], self.basement['y'])
+        )
         self.level_surface.blit(self.map_surface, self.viewport, self.viewport)
 
         for entity in self.entities['all']:
