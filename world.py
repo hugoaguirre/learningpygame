@@ -1,6 +1,8 @@
 import pygame
 from os.path import join as path_join
 
+from entity import Entity
+from door import Door
 from constants import ENEMY_DESTROYED_EVENT, SCREEN_SIZE
 from maprender import MapRender
 from settings import settings
@@ -15,7 +17,14 @@ class World:
 
         mapRender = MapRender(World.LEVEL_ONE_FILENAME)
         self.map_surface = mapRender.get_surface()
-        self.add_entity(mapRender.get_blocker_entities(), ('blocker'))
+        self.add_entity(
+            mapRender.get_object_entities('blocker', Entity, passable=False),
+            ('blockers', )
+        )
+        self.add_entity(
+            mapRender.get_object_entities('door', Door, passable=False),
+            ('doors', )
+        )
 
         self.viewport = pygame.Rect((0, 0), SCREEN_SIZE)
         self.level_surface = pygame.Surface(mapRender.get_size())
@@ -68,15 +77,9 @@ class World:
 
         surface.blit(self.level_surface, (0, 0), self.viewport)
 
-    def get_close_entity(self, name, location, close=100):
-        location = Vector(*location)
-
-        for entity in self.entities['all']:
-            if entity.name == name:
-                distance = location.get_distance_to(entity.get_location())
-                if distance < close:
-                    return entity
-        return None
+    def get_close_entities(self, group, location, close=100):
+        return [e for e in self.entities[group]
+                if location.get_distance_to(e.get_location()) < close]
 
     def process_events(self, events):
         for event in events:

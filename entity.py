@@ -79,6 +79,9 @@ class Entity(pygame.sprite.Sprite):
             self.flip()
         self.mask = pygame.mask.from_surface(self._image)
 
+    def get_image(self):
+        return self._image
+
     def flip(self):
         if not self._is_flip:
             self._is_flip = True
