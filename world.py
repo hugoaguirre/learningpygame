@@ -15,7 +15,7 @@ class World:
 
         mapRender = MapRender(World.LEVEL_ONE_FILENAME)
         self.map_surface = mapRender.get_surface()
-        self.add_entity(mapRender.get_blocker_entities(), ('blocker'))
+        self.add_entity(mapRender.get_blocker_entities(), ('blockers', ))
 
         self.viewport = pygame.Rect((0, 0), SCREEN_SIZE)
         self.level_surface = pygame.Surface(mapRender.get_size())
@@ -29,6 +29,9 @@ class World:
                 # First entity of its kind
                 self.entities[kind] = pygame.sprite.Group()
             self.entities[kind].add(entity)
+
+    def get_world_limits(self):
+        return self.map_surface.get_size()
 
     def process(self, time_passed):
         for entity in self.entities['all']:
@@ -52,6 +55,12 @@ class World:
                     if player.receive_hit():
                         player.kill()
                         return True  # should quit?
+
+        if self.entities.get('blockers') and self.entities.get('shots'):
+            for shot in self.entities['shots']:
+                if pygame.sprite.spritecollideany(shot, self.entities['blockers'], pygame.sprite.collide_rect):
+                    shot.kill()
+
         return False
 
 
