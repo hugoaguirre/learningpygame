@@ -7,6 +7,7 @@ from constants import ENEMY_DESTROYED_EVENT, SCREEN_SIZE
 from maprender import MapRender
 from settings import settings
 from vector import Vector
+from viewport import Viewport
 
 
 class World:
@@ -25,8 +26,12 @@ class World:
             mapRender.get_object_entities('door', Door, passable=False),
             ('doors', )
         )
+        self.add_entity(
+            mapRender.get_object_entities('trigger', Entity, passable=True),
+            ('triggers', )
+        )
 
-        self.viewport = pygame.Rect((0, 0), SCREEN_SIZE)
+        self.viewport = Viewport()
         self.level_surface = pygame.Surface(mapRender.get_size())
 
     def add_entity(self, entity, kinds=None):
@@ -40,6 +45,7 @@ class World:
             self.entities[kind].add(entity)
 
     def process(self, time_passed):
+        self.viewport.move(time_passed)
         for entity in self.entities['all']:
             entity.process(time_passed)
 
@@ -67,15 +73,14 @@ class World:
     def render(self, surface):
         player = self.get_player()
         if player:
-            self.viewport.center = player.rect.center
-            self.viewport.clamp_ip(self.level_surface.get_rect())
+            self.viewport.center(player.rect.center, self.level_surface.get_rect())
 
-        self.level_surface.blit(self.map_surface, self.viewport, self.viewport)
+        self.level_surface.blit(self.map_surface, self.viewport.get(), self.viewport.get())
 
         for entity in self.entities['all']:
             entity.render(self.level_surface)
 
-        surface.blit(self.level_surface, (0, 0), self.viewport)
+        surface.blit(self.level_surface, (0, 0), self.viewport.get())
 
     def get_close_entities(self, group, location, close=100):
         return [e for e in self.entities[group]
