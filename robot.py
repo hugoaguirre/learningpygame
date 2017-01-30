@@ -15,7 +15,7 @@ class Robot(Entity):
     SCORE = 100
     IMAGE_FILENAME = path_join("images", "robot.png")
 
-    def __init__(self, world, location=(0, 0)):
+    def __init__(self, world, location=None):
         # FIX integrate pyganim as part on entity
         images = pyganim.getImagesFromSpriteSheet(path_join('images', 'anirobot.png'), rows=1, cols=3, rects=[])
         frames = list(zip(images, [200, 200, 200]))

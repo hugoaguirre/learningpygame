@@ -104,9 +104,9 @@
   <object id="47" name="door" type="door" x="3392" y="640" width="64" height="64"/>
   <object id="48" name="door" type="door" x="3392" y="896" width="64" height="64"/>
   <object id="49" name="door" type="door" x="2816" y="1344" width="64" height="64"/>
-  <object id="88" name="trigger" x="770" y="1287" width="9.19732" height="109.532">
+  <object id="88" name="trigger" x="768" y="1280" width="10" height="128">
    <properties>
-    <property name="action" value="move_camera"/>
+    <property name="action" value="boss_battle"/>
     <property name="move_camera_x" type="int" value="0"/>
     <property name="move_camera_y" type="int" value="1080"/>
    </properties>

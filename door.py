@@ -10,7 +10,6 @@ class Door(Entity):
 
     def __init__(self, *args, **kwargs):
         sprite = pygame.image.load(Door.CLOSED_IMAGE_FILENAME).convert_alpha()
-        print args
         super(Door, self).__init__(self, args[1], sprite, **kwargs)
         self.open_door = pygame.image.load(Door.OPEN_IMAGE_FILENAME).convert_alpha()
         self.keep_open = False
