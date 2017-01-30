@@ -36,7 +36,7 @@ class Spider(Entity):
     def shoot(self):
         thunder = Thunder(self.world)
         thunder.set_location(self.get_location() + Vector(31, 34))
-        self.world.add_entity(thunder, ('enemy_shots', ))
+        self.world.add_entity(thunder, ('enemy_shots', 'shots'))
 
     def __del__(self):
         print 'bye'

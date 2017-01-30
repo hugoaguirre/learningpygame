@@ -52,7 +52,7 @@ class Robot(Entity):
         location = self.get_location()
         laser = Laser(self.world, flip=self.is_flip())
         laser.set_location(location)
-        self.world.add_entity(laser, ('enemy_shots', ))
+        self.world.add_entity(laser, ('enemy_shots', 'shots'))
         play_laser()
 
     def flip(self):
@@ -74,7 +74,7 @@ class RobotStateDodging(State):
 
     def random_destination(self, but=None):
         location = self.robot.get_location()
-        location.x, location.y = int(location.x), int(location.y)
+        (x, y) = int(location.x), int(location.y)
         range_x = [-200, 200]
         range_y = [-200, 200]
 
@@ -83,8 +83,8 @@ class RobotStateDodging(State):
             range_y[0 if but[1] < 0 else 1] = 0
 
         self.robot.set_destination(Vector(
-            randint(location.x + range_x[0], location.x + range_x[1]),
-            randint(location.y + range_y[0], location.y + range_y[1])
+            randint(x + range_x[0], x + range_x[1]),
+            randint(y + range_y[0], y + range_y[1])
         ))
 
     def do_actions(self):
@@ -158,7 +158,8 @@ class Laser(Entity):
         super(Laser, self).__init__(
             world, 'laser', sprite,
             flip=flip,
-            speed=Laser.SPEED
+            speed=Laser.SPEED,
+            kill_on_leaving_screen=True,
         )
 
     def process(self, time_passed):

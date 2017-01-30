@@ -30,7 +30,16 @@ class World:
             ('triggers', )
         )
 
+        # parallax this
+        basement = mapRender.map_data.get_layer_by_name('basement')
+        self.basement = {
+            'image': pygame.image.load(basement.source.replace('../', '')),
+            'x': 800,
+            'y': 650,
+        }
+
         self.viewport = Viewport()
+
         self.level_surface = pygame.Surface(mapRender.get_size())
 
     def add_entity(self, entity, kinds=None):
@@ -43,6 +52,9 @@ class World:
                 self.entities[kind] = pygame.sprite.Group()
             self.entities[kind].add(entity)
 
+    def get_world_limits(self):
+        return self.map_surface.get_size()
+
     def process(self, time_passed):
         self.viewport.move(time_passed)
         for entity in self.entities['all']:
@@ -53,7 +65,7 @@ class World:
     def detect_collisions(self):
         if (self.entities.get('enemies') and self.entities.get('ally_shots')):
             for enemy in self.entities['enemies']:
-                collisions = pygame.sprite.spritecollide(enemy, self.entities['ally_shots'], True, pygame.sprite.collide_mask)
+                collisions = pygame.sprite.spritecollide(enemy, self.entities['ally_shots'], False, pygame.sprite.collide_mask)
                 if collisions:
                     if enemy.receive_hit():
                         event = pygame.event.Event(ENEMY_DESTROYED_EVENT, enemy_class=enemy.__class__)
@@ -62,19 +74,35 @@ class World:
 
         if self.entities.get('enemy_shots') and not settings['debug']:
             for player in self.entities['player']:
-                collisions = pygame.sprite.spritecollide(player, self.entities['enemy_shots'], True, pygame.sprite.collide_mask)
+                collisions = pygame.sprite.spritecollide(player, self.entities['enemy_shots'], False, pygame.sprite.collide_mask)
                 if collisions:
                     if player.receive_hit():
                         player.kill()
                         return True  # should quit?
+
+        if self.entities.get('blockers') and self.entities.get('shots'):
+            for shot in self.entities['shots']:
+                if pygame.sprite.spritecollideany(shot, self.entities['blockers'], pygame.sprite.collide_rect):
+                    shot.kill()
+
         return False
 
 
     def render(self, surface):
         player = self.get_player()
         if player:
+            old_left = self.viewport.get().left
+            old_top = self.viewport.get().top
             self.viewport.center(player.rect.center, self.level_surface.get_rect())
+            diff_left = self.viewport.get().left - old_left
+            diff_top = self.viewport.get().top - old_top
+            self.basement['x'] += int(diff_left * 0.3)
+            self.basement['y'] += int(diff_top * 0.3)
 
+        self.level_surface.blit(
+            self.basement['image'],
+            (self.basement['x'], self.basement['y'])
+        )
         self.level_surface.blit(self.map_surface, self.viewport.get(), self.viewport.get())
 
         for entity in self.entities['all']:
