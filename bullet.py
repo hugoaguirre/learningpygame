@@ -3,7 +3,7 @@ from os.path import join as path_join
 
 from vector import Vector
 from entity import Entity
-from constants import SCREEN_SIZE, COLOR_BLACK
+from constants import  COLOR_BLACK
 
 
 class Bullet(Entity):
@@ -20,8 +20,7 @@ class Bullet(Entity):
             world, 'Bullet', sprite,
             flip=flip,
             speed=Bullet.SPEED,
-            location=location,
-            kill_on_leaving_screen=True
+            location=location
         )
 
     def process(self, time_passed):
