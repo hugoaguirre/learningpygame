@@ -5,8 +5,8 @@ from vector import Vector
 from entity import Entity
 from spritesheet import Spritesheet
 from weapon import Weapon
-from constants import NEED_RELOAD_EVENT, RELOAD_EVENT
 
+RELOAD_BUTTON_IMAGE_FILENAME = path_join('images', 'button_r.png')
 
 class Sara(Entity):
 
@@ -32,6 +32,8 @@ class Sara(Entity):
         self.weapon = Weapon(self, world)
 
         self.life = 3
+        self.image_reload = pygame.image.load(RELOAD_BUTTON_IMAGE_FILENAME).convert_alpha()
+        self.show_reload = False
 
     def process(self, time_passed):
         self.open_doors()
@@ -58,8 +60,7 @@ class Sara(Entity):
 
         if pressed_keys[pygame.K_r]:
             self.weapon.reload()
-            event = pygame.event.Event(RELOAD_EVENT)
-            pygame.event.post(event)
+            self.show_reload = False
 
         direction.normalize()
 
@@ -74,8 +75,7 @@ class Sara(Entity):
 
     def fire(self):
         if not self.weapon.fire():
-            event = pygame.event.Event(NEED_RELOAD_EVENT)
-            pygame.event.post(event)
+            self.show_reload = True
 
     def receive_hit(self):
         '''Perform actions when player receive hit, return boolean
@@ -84,6 +84,18 @@ class Sara(Entity):
         self.life -= 1
         self.flash()
         return self.life == 0
+
+    def render(self, surface):
+        # This is HUD, but not rendered at game.py we render here
+        # because it is not fixed on screen but it follows sara
+        # needs to be render to level_surface (see World.render)
+        if self.show_reload:
+            x, y = self.rect.midtop
+            y -= self.image_reload.get_height() + 4
+            x -= 14 if self.is_flip() else 26
+            surface.blit(self.image_reload, (x, y))
+
+        super(Sara, self).render(surface)
 
     def move(self, time_passed):
         is_moving = super(Sara, self).move(time_passed)
