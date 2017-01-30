@@ -1,4 +1,6 @@
 import pygame
+from os.path import join as path_join
+
 import menu
 import argparse
 from settings import settings
@@ -9,7 +11,8 @@ def init_screen():
     pygame.init()
     pygame.mouse.set_visible(0)
     pygame.display.set_caption('Sara\'s shooter')
-    return pygame.display.set_mode(SCREEN_SIZE)
+    pygame.display.set_icon(pygame.image.load(path_join('images', 'icon.png')))
+    return pygame.display.set_mode(SCREEN_SIZE, pygame.DOUBLEBUF)
 
 
 def parse_args():
