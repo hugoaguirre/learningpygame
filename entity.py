@@ -180,6 +180,8 @@ class Entity(pygame.sprite.Sprite):
             self.set_location(self._location + vec_to_destination)
 
             # cancel movement
+            # Known (kind of) issue You can trespass impassable entities when you are fast enough,
+            # quick test with sara: speed = 1500 she can go trough walls of 14px
             if not self.is_passable() and self.is_colliding_with_impassable_entities():
                 self._has_collide = self._destination
                 # because movement is interrupted can be defined as a float, which may lead to troubles

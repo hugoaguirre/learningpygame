@@ -26,6 +26,6 @@ class Bullet(Entity):
 
     def process(self, time_passed):
         if not self.get_destination():
-            x = 0 - self.get_width() if self.is_flip() else SCREEN_SIZE[0] + self.get_width()
+            x = 0 - self.get_width() if self.is_flip() else self.world.get_world_limits()[0] + self.get_width()
             self.set_destination(Vector(x, self.get_location().y))
         super(Bullet, self).process(time_passed)

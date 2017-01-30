@@ -52,7 +52,7 @@ class Robot(Entity):
         location = self.get_location()
         laser = Laser(self.world, flip=self.is_flip())
         laser.set_location(location)
-        self.world.add_entity(laser, ('enemy_shots', ))
+        self.world.add_entity(laser, ('enemy_shots', 'shots'))
         play_laser()
 
     def flip(self):
