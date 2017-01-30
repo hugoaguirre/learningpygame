@@ -21,7 +21,7 @@ class MapRender:
             self.map_surface = pygame.Surface(self.get_size())
 
             if self.map_data.background_color:
-                self.map_surface.fill(self.map_data.background_color)
+                self.map_surface.fill(pygame.Color(self.map_data.background_color))
 
             for layer in self.map_data.visible_layers:
                 if isinstance(layer, pytmx.TiledTileLayer):
@@ -32,6 +32,7 @@ class MapRender:
                              y * self.map_data.tileheight)
                         )
 
+        self.map_surface.set_colorkey(pygame.Color(self.map_data.background_color))
         return self.map_surface
 
     def get_object_entities(self, name, entity_class, **kwargs):
