@@ -10,8 +10,8 @@ RELOAD_BUTTON_IMAGE_FILENAME = path_join('images', 'button_r.png')
 
 class Sara(Entity):
 
-    SPEED = 200
-    ANIMATION_TICKS = 12
+    SPEED = 250
+    ANIMATION_TICKS = 5
     IMAGE_FILENAME = path_join('images', 'sara.png')
 
     def __init__(self, world):
