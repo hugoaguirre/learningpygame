@@ -27,7 +27,7 @@ class Robot(Entity):
         super(Robot, self).__init__(
             world, 'Robot', sprite,
             passable=False,
-            can_leave_screen=False,
+            can_leave_screen=True,
             brain=self._build_brain(),
             location=location)
 
@@ -158,15 +158,11 @@ class Laser(Entity):
         super(Laser, self).__init__(
             world, 'laser', sprite,
             flip=flip,
-            speed=Laser.SPEED,
-            kill_on_leaving_screen=True,
+            speed=Laser.SPEED
         )
 
     def process(self, time_passed):
         if not self.get_destination():
-            x = 0 - self.get_width() if self.is_flip() else SCREEN_SIZE[0] + self.get_width()
-            self.set_destination(Vector(
-                x,
-                self.get_location().y
-            ))
+            x = 0 - self.get_width() if self.is_flip() else self.world.get_world_limits()[0] + self.get_width()
+            self.set_destination(Vector(x, self.get_location().y))
         super(Laser, self).process(time_passed)

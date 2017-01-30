@@ -19,8 +19,7 @@ class Entity(pygame.sprite.Sprite):
                  destination=None,
                  speed=0,
                  props=None,
-                 life=1,
-                 kill_on_leaving_screen=False):
+                 life=1):
         super(Entity, self).__init__()
         self.props = props
         self.world = world
@@ -52,8 +51,6 @@ class Entity(pygame.sprite.Sprite):
             self.set_location(Vector(0, 0))
         else:
             self.set_location(location)
-
-        self._kill_on_leaving_screen = kill_on_leaving_screen
 
         self.id = 0
         self._life = life
@@ -163,8 +160,6 @@ class Entity(pygame.sprite.Sprite):
         if self._brain:
             self._brain.think(time_passed)
         self.move(time_passed)
-        if self._kill_on_leaving_screen and self.is_off_screen():
-            self.kill()
 
     def is_off_screen(self):
         return (self._location.x < 0 or
