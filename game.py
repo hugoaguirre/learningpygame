@@ -7,7 +7,6 @@ from random import randint
 import menu
 from sara import Sara
 from robot import Robot
-from spider import Spider
 from tank import Tank
 from world import World
 from vector import Vector
@@ -59,16 +58,13 @@ class Game:
         self.possible_enemies[100] = self.create_robot
 
         while not should_quit:
-            if randint(1, 250) == 1:
+            if randint(1, 100) == 1:
                 # Create an enemy
                 hard = randint(0, 99)
                 for enemy_creator in self.possible_enemies[hard:]:
                     if enemy_creator:
                         enemy_creator()
 
-            # Adding enemies
-            if self.score == 500:
-                self.possible_enemies[30] = self.create_spider
 
             self.process_events()
             seconds_passed = self.clock.tick(60) / 1000.0
@@ -134,21 +130,18 @@ class Game:
 
     def create_robot(self):
         robot = Robot(self.world)
-        # 150px is just in front of sara
-        robot.set_location(Vector(randint(150, SCREEN_SIZE[0]), randint(0, SCREEN_SIZE[1])))
-        # Really lazy way to prevent collition at init
-        # see Entity.move()
-        while robot.is_colliding_with_impassable_entities():
-            print 'collide at init'
-            robot.set_location(Vector(randint(150, SCREEN_SIZE[0]), randint(0, SCREEN_SIZE[1])))
+        sarax = int(self.sara.get_location().x)
+        saray = int(self.sara.get_location().y)
+        while True:
+            x = randint(max(0, sarax - 600), min(sarax + 600, self.world.level_surface.get_width()))
+            y = randint(max(0, saray - 600), min(saray + 600, self.world.level_surface.get_height()))
+            robot.set_location(Vector(x, y))
+            # Really lazy way to prevent collition at init
+            if not robot.is_colliding_with_impassable_entities():
+                break
 
         self.world.add_entity(robot, ('enemies', ))
         self.robots_created += 1
-
-    def create_spider(self):
-        spider = Spider(self.world)
-        spider.set_location(Vector(200, 1))
-        self.world.add_entity(spider, ('enemies',))
 
     def start_boss_battle(self, trigger, onend=None):
         trigger.props['action'] = None
