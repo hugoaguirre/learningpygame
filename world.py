@@ -39,7 +39,7 @@ class World:
     def detect_collisions(self):
         if (self.entities.get('enemies') and self.entities.get('ally_shots')):
             for enemy in self.entities['enemies']:
-                collisions = pygame.sprite.spritecollide(enemy, self.entities['ally_shots'], True, pygame.sprite.collide_mask)
+                collisions = pygame.sprite.spritecollide(enemy, self.entities['ally_shots'], False, pygame.sprite.collide_mask)
                 if collisions:
                     event = pygame.event.Event(ENEMY_DESTROYED_EVENT, enemy_class=enemy.__class__)
                     pygame.event.post(event)
@@ -47,7 +47,7 @@ class World:
 
         if self.entities.get('enemy_shots') and not settings['debug']:
             for player in self.entities['player']:
-                collisions = pygame.sprite.spritecollide(player, self.entities['enemy_shots'], True, pygame.sprite.collide_mask)
+                collisions = pygame.sprite.spritecollide(player, self.entities['enemy_shots'], False, pygame.sprite.collide_mask)
                 if collisions:
                     if player.receive_hit():
                         player.kill()

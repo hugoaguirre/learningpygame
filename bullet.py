@@ -20,7 +20,8 @@ class Bullet(Entity):
             world, 'Bullet', sprite,
             flip=flip,
             speed=Bullet.SPEED,
-            location=location
+            location=location,
+            kill_on_leaving_screen=True
         )
 
     def process(self, time_passed):
