@@ -2,6 +2,7 @@ import pygame
 
 from vector import Vector
 from constants import SCREEN_SIZE
+from settings import settings
 
 
 class Entity(pygame.sprite.Sprite):
@@ -17,7 +18,8 @@ class Entity(pygame.sprite.Sprite):
                  location=None,
                  destination=None,
                  speed=0,
-                 props=None):
+                 props=None,
+                 kill_on_leaving_screen=False):
         super(Entity, self).__init__()
         self.props = props
         self.world = world
@@ -48,10 +50,16 @@ class Entity(pygame.sprite.Sprite):
         if image:
             self.set_image(image)
 
+        self._kill_on_leaving_screen = kill_on_leaving_screen
+
         self.id = 0
 
         # Internal state
         self._has_collide = None
+
+    def __del__(self):
+        if settings['debug']:
+            print 'Free object of class {}'.format(self.__class__.__name__)
 
     def is_passable(self):
         return self._passable
@@ -151,6 +159,14 @@ class Entity(pygame.sprite.Sprite):
         if self._brain:
             self._brain.think(time_passed)
         self.move(time_passed)
+        if self._kill_on_leaving_screen and self.is_off_screen():
+            self.kill()
+
+    def is_off_screen(self):
+        return (self._location.x < 0 or
+                self._location.x > SCREEN_SIZE[0] or
+                self._location.y < 0 or
+                self._location.y > SCREEN_SIZE[1])
 
     def move(self, time_passed):
         self._has_collide = None
@@ -169,6 +185,8 @@ class Entity(pygame.sprite.Sprite):
             self.set_location(self._location + vec_to_destination)
 
             # cancel movement
+            # Known (kind of) issue You can trespass impassable entities when you are fast enough,
+            # quick test with sara: speed = 1500 she can go trough walls of 14px
             if not self.is_passable() and self.is_colliding_with_impassable_entities():
                 self._has_collide = self._destination
                 # because movement is interrupted can be defined as a float, which may lead to troubles
@@ -203,3 +221,9 @@ class Entity(pygame.sprite.Sprite):
         x = self._location.x + self.get_width() / 2
         y = self._location.y + self.get_height() / 2
         return (x, y)
+
+    def kill(self):
+        # Destroy brain so gc can collect this entity
+        if self._brain:
+            self._brain = None
+        super(Entity, self).kill()
