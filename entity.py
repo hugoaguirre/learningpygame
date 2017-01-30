@@ -9,6 +9,7 @@ class Entity(pygame.sprite.Sprite):
 
     def __init__(self, world, name,
                  image=None,
+                 rect=None,
                  spritesheet=None,
                  flip=False,
                  passable=True,
@@ -21,7 +22,7 @@ class Entity(pygame.sprite.Sprite):
         super(Entity, self).__init__()
         self.world = world
         self.name = name
-        if not image:
+        if not image and spritesheet:
             self.spritesheet = spritesheet
             image = spritesheet.get_image(0)
 
@@ -36,12 +37,16 @@ class Entity(pygame.sprite.Sprite):
         self._speed = speed
 
         # Needed by pygame
-        self.rect = image.get_rect()
+        if image:
+            self.rect = image.get_rect()
+        else:
+            self.rect = rect
 
         self._image = None
         self._is_flip = flip
         self._flash = None
-        self.set_image(image)
+        if image:
+            self.set_image(image)
 
         self._kill_on_leaving_screen = kill_on_leaving_screen
 
@@ -125,6 +130,8 @@ class Entity(pygame.sprite.Sprite):
         self._flash_duration = 5
 
     def render(self, surface):
+        if not self._image:
+            return
         x = self._location.x
         y = self._location.y
 
@@ -197,8 +204,11 @@ class Entity(pygame.sprite.Sprite):
 
     def is_colliding_with_impassable_entities(self):
         entities = self.world.get_impassable_entities(but_me=self)
-        collisions = pygame.sprite.spritecollide(self, entities, False, pygame.sprite.collide_mask)
-        return len(collisions) != 0
+        entities_with_image = [entity for entity in entities if entity._image]
+        entities_rect = [entity for entity in entities if entity._image is None]
+        col_mask = pygame.sprite.spritecollideany(self, entities_with_image, pygame.sprite.collide_mask)
+        col_rect = pygame.sprite.spritecollideany(self, entities_rect, pygame.sprite.collide_rect)
+        return col_mask or col_rect
 
     def get_middle(self):
         x = self._location.x + self.get_width() / 2

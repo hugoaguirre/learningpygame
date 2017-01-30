@@ -34,7 +34,7 @@ class Game:
         self.world = World()
 
         self.sara = Sara(self.world)
-        self.sara.set_location(Vector(100, SCREEN_SIZE[1] / 2))
+        self.sara.set_location(Vector(20, 74))
         self.world.add_entity(self.sara, ('events', 'player'))
 
         self.images = dict()

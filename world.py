@@ -1,22 +1,24 @@
-from vector import Vector
 import pygame
-from random import choice as random_choice
-from spritesheet import Spritesheet
-from settings import settings
+from os.path import join as path_join
+
 from constants import ENEMY_DESTROYED_EVENT, SCREEN_SIZE
+from maprender import MapRender
+from settings import settings
+from vector import Vector
 
 
 class World:
+    LEVEL_ONE_FILENAME = path_join('levels', 'one.tmx')
+
     def __init__(self):
         self.entities = {'all': pygame.sprite.Group()}
-        ss = Spritesheet('images/metalfloor.png', 64)
-        bg_tiles = ss.get_images()
 
-        self.background = pygame.surface.Surface(SCREEN_SIZE)
-        # 32 is the size of the tile
-        for x in xrange(0, SCREEN_SIZE[0], 32):
-            for y in xrange(0, SCREEN_SIZE[1], 32):
-                self.background.blit(random_choice(bg_tiles), (x, y))
+        mapRender = MapRender(World.LEVEL_ONE_FILENAME)
+        self.map_surface = mapRender.get_surface()
+        self.add_entity(mapRender.get_blocker_entities(), ('blocker'))
+
+        self.viewport = pygame.Rect((0, 0), SCREEN_SIZE)
+        self.level_surface = pygame.Surface(mapRender.get_size())
 
     def add_entity(self, entity, kinds=None):
         self.entities['all'].add(entity)
@@ -52,10 +54,19 @@ class World:
                         return True  # should quit?
         return False
 
+
     def render(self, surface):
-        surface.blit(self.background, (0, 0))
+        player = self.get_player()
+        if player:
+            self.viewport.center = player.rect.center
+            self.viewport.clamp_ip(self.level_surface.get_rect())
+
+        self.level_surface.blit(self.map_surface, self.viewport, self.viewport)
+
         for entity in self.entities['all']:
-            entity.render(surface)
+            entity.render(self.level_surface)
+
+        surface.blit(self.level_surface, (0, 0), self.viewport)
 
     def get_close_entity(self, name, location, close=100):
         location = Vector(*location)
@@ -76,7 +87,10 @@ class World:
             entity.process_events(events)
 
     def get_player(self):
-        return self.entities['player'].sprites()[0]
+        try:
+            return self.entities['player'].sprites()[0]
+        except IndexError:
+            return None
 
     def get_impassable_entities(self, but_me=None):
         return [entity for entity in self.entities['all'] if not entity.is_passable() and entity is not but_me]

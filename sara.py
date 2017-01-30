@@ -20,7 +20,7 @@ class Sara(Entity):
             world, 'sara',
             spritesheet=ss,
             passable=False,
-            can_leave_screen=False,
+            can_leave_screen=True,
             speed=Sara.SPEED
         )
 
