@@ -33,6 +33,14 @@ class Sara(Entity):
 
         self.life = 3
 
+    def process(self, time_passed):
+        self.open_doors()
+        super(Sara, self).process(time_passed)
+
+    def open_doors(self):
+        for door in self.world.get_close_entities('doors', self.get_location()):
+            door.open()
+
     def process_events(self, events):
         pressed_keys = pygame.key.get_pressed()
         direction = Vector(0, 0)
