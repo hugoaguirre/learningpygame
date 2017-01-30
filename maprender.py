@@ -2,7 +2,7 @@ import pygame
 import pytmx
 from pytmx.util_pygame import load_pygame
 
-from entity import Entity
+from vector import Vector
 
 
 class MapRender:
@@ -35,23 +35,23 @@ class MapRender:
         self.map_surface.set_colorkey(pygame.Color(self.map_data.background_color))
         return self.map_surface
 
-    def get_blocker_entities(self):
-        if not self.blocker_entities:
-            self.blocker_entities = []
-            for layer in self.map_data.visible_layers:
-                if isinstance(layer, pytmx.TiledObjectGroup):
-                    for obj in layer:
-                        properties = obj.__dict__
-                        if properties['name'] == 'blocker':
-                            left = properties['x']
-                            top = properties['y']
-                            width = properties['width']
-                            height = properties['height']
-                            blockerEntity = Entity(
-                                self,
-                                'blocker',
-                                passable=False,
-                                rect=pygame.Rect(left, top, width, height)
-                            )
-                            self.blocker_entities.append(blockerEntity)
-        return self.blocker_entities
+    def get_object_entities(self, name, entity_class, **kwargs):
+        entities = []
+        for layer in self.map_data.visible_layers:
+            if isinstance(layer, pytmx.TiledObjectGroup):
+                for obj in layer:
+                    properties = obj.__dict__
+                    if properties['name'] == name:
+                        left = properties['x']
+                        top = properties['y']
+                        width = properties['width']
+                        height = properties['height']
+                        entity = entity_class(
+                            self,
+                            name,
+                            rect=pygame.Rect(left, top, width, height),
+                            location=Vector(left, top),
+                            **kwargs
+                        )
+                        entities.append(entity)
+        return entities

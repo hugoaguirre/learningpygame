@@ -2,9 +2,7 @@ import pygame
 import menu
 import argparse
 from settings import settings
-
-
-SCREEN_SIZE = (800, 600)
+from constants import SCREEN_SIZE
 
 
 def init_screen():
