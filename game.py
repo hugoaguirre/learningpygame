@@ -8,13 +8,15 @@ import menu
 from sara import Sara
 from robot import Robot
 from spider import Spider
+from tank import Tank
 from world import World
 from vector import Vector
 from settings import settings
-from constants import ENEMY_DESTROYED_EVENT, SCREEN_SIZE, SONG_END_EVENT
+from constants import ENEMY_DESTROYED_EVENT, SCREEN_SIZE, SONG_END_EVENT, BOSS_BATTLE_EVENT
 
 
 LIFE_IMAGE_FILENAME = path_join('images', 'heart.png')
+
 
 class Game:
     def __init__(self, screen):
@@ -45,36 +47,30 @@ class Game:
         for _ in xrange(settings['initial_robots']):
             self.create_robot()
 
+        self.possible_enemies = None
+        self.init_enemy_creation()
         self.main()
+
+    def init_enemy_creation(self):
+        self.possible_enemies = [None] * 101
 
     def main(self):
         should_quit = False
-        possible_enemies = [None] * 101
-        possible_enemies[100] = self.create_robot
+        self.possible_enemies[100] = self.create_robot
 
         while not should_quit:
             if randint(1, 250) == 1:
                 # Create an enemy
                 hard = randint(0, 99)
-                for enemy_creator in possible_enemies[hard:]:
+                for enemy_creator in self.possible_enemies[hard:]:
                     if enemy_creator:
                         enemy_creator()
 
             # Adding enemies
             if self.score == 500:
-                possible_enemies[30] = self.create_spider
+                self.possible_enemies[30] = self.create_spider
 
-            events = pygame.event.get()
-            for event in events:
-                if event.type == SONG_END_EVENT and not settings['debug']:
-                    pygame.mixer.music.load('music/main.wav')
-                    pygame.mixer.music.play(-1)
-                if event.type == ENEMY_DESTROYED_EVENT:
-                    try:
-                        self.score += event.enemy_class.SCORE
-                    except AttributeError:
-                        pass  # no score
-            self.world.process_events(events)
+            self.process_events()
             seconds_passed = self.clock.tick(60) / 1000.0
             should_quit = self.world.process(seconds_passed)
             self.world.render(self.screen)
@@ -87,6 +83,21 @@ class Game:
         self.show_game_over()
 
         menu.MainMenu(self.screen)
+
+    def process_events(self):
+        events = pygame.event.get()
+        for event in events:
+            if event.type == SONG_END_EVENT and not settings['debug']:
+                pygame.mixer.music.load('music/main.wav')
+                pygame.mixer.music.play(-1)
+            if event.type == ENEMY_DESTROYED_EVENT:
+                try:
+                    self.score += event.enemy_class.SCORE
+                except AttributeError:
+                    pass  # no score
+            if event.type == BOSS_BATTLE_EVENT:
+                self.start_boss_battle(event.trigger, event.on_end_callback)
+        self.world.process_events(events)
 
     def render(self):
         '''Use it to render HUD'''
@@ -138,3 +149,27 @@ class Game:
         spider = Spider(self.world)
         spider.set_location(Vector(200, 1))
         self.world.add_entity(spider, ('enemies',))
+
+    def start_boss_battle(self, trigger, onend=None):
+        trigger.props['action'] = None
+        for enemy in self.world.entities['enemies']:
+            enemy.kill()
+        pygame.mixer.music.load('music/bossbattle.wav')
+        pygame.mixer.music.play(-1)
+        self.init_enemy_creation()  # No more enemy creation
+
+        tank = Tank(
+            self.world,
+            'Tank',
+            location=Vector(64, 1280),
+            flip=False,
+            passable=False,
+        )
+        self.world.add_entity(tank, ('enemies', ))
+
+        self.world.viewport.lock()
+        self.world.viewport.move_to(
+            Vector(int(trigger.props['move_camera_x']),
+                   int(trigger.props['move_camera_y'])),
+            on_arrival=lambda: (onend(), tank.build_brain())
+        )

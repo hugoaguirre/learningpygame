@@ -28,7 +28,6 @@ class Viewport:
         self.locked = False
 
     def move_to(self, destination, speed=100, on_arrival=None):
-        print destination
         self.destination = destination
         self.speed = speed
         self.on_arrival = on_arrival

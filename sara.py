@@ -5,6 +5,7 @@ from vector import Vector
 from entity import Entity
 from spritesheet import Spritesheet
 from weapon import Weapon
+from constants import BOSS_BATTLE_EVENT
 
 RELOAD_BUTTON_IMAGE_FILENAME = path_join('images', 'button_r.png')
 
@@ -47,14 +48,15 @@ class Sara(Entity):
 
     def activate_triggers(self):
         for trigger in self.world.get_close_entities('triggers', self.get_location(), 50):
-            if trigger.props['action'] == 'move_camera':
-                trigger.props['action'] = None
-                self.world.viewport.lock()
-                self.world.viewport.move_to(
-                    Vector(int(trigger.props['move_camera_x']),
-                           int(trigger.props['move_camera_y'])),
-                    on_arrival=lambda: (trigger.set_passable(False), self.set_auto(False))
+            if trigger.props['action'] == 'boss_battle':
+                e = pygame.event.Event(
+                    BOSS_BATTLE_EVENT,
+                    {
+                        'on_end_callback':lambda: (trigger.set_passable(False), self.set_auto(False)),
+                        'trigger': trigger
+                    }
                 )
+                pygame.event.post(e)
                 self.auto_move(self.get_location() - Vector(128, 0))
 
     def set_auto(self, auto):

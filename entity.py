@@ -19,6 +19,7 @@ class Entity(pygame.sprite.Sprite):
                  destination=None,
                  speed=0,
                  props=None,
+                 life=1,
                  kill_on_leaving_screen=False):
         super(Entity, self).__init__()
         self.props = props
@@ -28,9 +29,6 @@ class Entity(pygame.sprite.Sprite):
             self.spritesheet = spritesheet
             image = spritesheet.get_image(0)
 
-        if not location:
-            location = Vector(0, 0)
-        self._location = location
         self._destination = destination
         self._passable = passable
         self._can_leave_screen = can_leave_screen
@@ -50,9 +48,15 @@ class Entity(pygame.sprite.Sprite):
         if image:
             self.set_image(image)
 
+        if not location:
+            self.set_location(Vector(0, 0))
+        else:
+            self.set_location(location)
+
         self._kill_on_leaving_screen = kill_on_leaving_screen
 
         self.id = 0
+        self._life = life
 
         # Internal state
         self._has_collide = None
@@ -170,7 +174,7 @@ class Entity(pygame.sprite.Sprite):
 
     def move(self, time_passed):
         self._has_collide = None
-        if self.get_speed() > 0 and self._location != self._destination:
+        if self._destination and self.get_speed() > 0 and self._location != self._destination:
             if not self.can_leave_screen():
                 self.keep_inside_screen()
             if not self.is_passable():
@@ -221,6 +225,14 @@ class Entity(pygame.sprite.Sprite):
         x = self._location.x + self.get_width() / 2
         y = self._location.y + self.get_height() / 2
         return (x, y)
+
+    def receive_hit(self):
+        self._life -= 1
+        self.flash()
+        return self._life == 0
+
+    def get_rect(self):
+        return self.rect
 
     def kill(self):
         # Destroy brain so gc can collect this entity

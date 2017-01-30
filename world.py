@@ -3,10 +3,9 @@ from os.path import join as path_join
 
 from entity import Entity
 from door import Door
-from constants import ENEMY_DESTROYED_EVENT, SCREEN_SIZE
+from constants import ENEMY_DESTROYED_EVENT
 from maprender import MapRender
 from settings import settings
-from vector import Vector
 from viewport import Viewport
 
 
@@ -68,9 +67,10 @@ class World:
             for enemy in self.entities['enemies']:
                 collisions = pygame.sprite.spritecollide(enemy, self.entities['ally_shots'], False, pygame.sprite.collide_mask)
                 if collisions:
-                    event = pygame.event.Event(ENEMY_DESTROYED_EVENT, enemy_class=enemy.__class__)
-                    pygame.event.post(event)
-                    enemy.kill()
+                    if enemy.receive_hit():
+                        event = pygame.event.Event(ENEMY_DESTROYED_EVENT, enemy_class=enemy.__class__)
+                        pygame.event.post(event)
+                        enemy.kill()
 
         if self.entities.get('enemy_shots') and not settings['debug']:
             for player in self.entities['player']:
