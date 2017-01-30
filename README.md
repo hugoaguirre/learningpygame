@@ -5,7 +5,7 @@ Having fun with pygame
 
 ## Install dependencies
 
-You need to have pip installed, refer to https://pip.pypa.io/en/stable/installing/ for installation instructions.
+You need to have pip installed, refer [here](https://pip.pypa.io/en/stable/installing/) for installation instructions.
 
 Then you can run the following command to install dependencies
 
@@ -23,14 +23,14 @@ or
 
 ## Contribute
 
-Go to https://github.com/juanjosegzl/learningpygame/issues?q=is%3Aopen+is%3Aissue+label%3Aeasy
+Check [easy tickets](https://github.com/juanjosegzl/learningpygame/issues?q=is%3Aopen+is%3Aissue+label%3Aeasy),
 those tickets are marked to be easy to start contributing.
 
 If you need help comment the ticket with your questions or, if you have one, your approach to solve the ticket.
 
 ### Git flow
 
-If you are not used to git you can read this chapter https://git-scm.com/book/en/v2/Git-Basics-Getting-a-Git-Repository or follow this recipe.
+If you are not used to git you can read [this chapter](https://git-scm.com/book/en/v2/Git-Basics-Getting-a-Git-Repository) or follow this recipe.
 
     git checkout master
     git pull origin master
@@ -39,5 +39,5 @@ If you are not used to git you can read this chapter https://git-scm.com/book/en
     git commit  # will open an editor, write a comment there
     git push --set-upstream origin <name_of_your_branch>
 
-Once your changes are pushed, you can go to https://github.com/juanjosegzl/learningpygame and create a new Pull Request
+Once your changes are pushed, you can go to [github](https://github.com/juanjosegzl/learningpygame) and create a new Pull Request
 Search for the buttom Compare & pull request
