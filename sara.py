@@ -36,6 +36,7 @@ class Sara(Entity):
         self.auto = False
         self.image_reload = pygame.image.load(RELOAD_BUTTON_IMAGE_FILENAME).convert_alpha()
         self.show_reload = False
+        self._keys = []
 
     def process(self, time_passed):
         self.open_doors()
@@ -44,7 +45,8 @@ class Sara(Entity):
 
     def open_doors(self):
         for door in self.world.get_close_entities('doors', self.get_location()):
-            door.open()
+            if door.props.get('key', None) == None or door.props['key'] in self._keys:
+                door.open()
 
     def activate_triggers(self):
         for trigger in self.world.get_close_entities('triggers', self.get_location(), 50):
