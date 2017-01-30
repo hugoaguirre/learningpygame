@@ -7,6 +7,7 @@ from constants import ENEMY_DESTROYED_EVENT, SCREEN_SIZE
 from maprender import MapRender
 from settings import settings
 from vector import Vector
+from viewport import Viewport
 
 
 class World:
@@ -25,16 +26,21 @@ class World:
             mapRender.get_object_entities('door', Door, passable=False),
             ('doors', )
         )
+        self.add_entity(
+            mapRender.get_object_entities('trigger', Entity, passable=True),
+            ('triggers', )
+        )
 
         # parallax this
         basement = mapRender.map_data.get_layer_by_name('basement')
         self.basement = {
             'image': pygame.image.load(basement.source.replace('../', '')),
             'x': 800,
-            'y': 650,  #int(basement.offsety)
+            'y': 650,
         }
 
-        self.viewport = pygame.Rect((0, 0), SCREEN_SIZE)
+        self.viewport = Viewport()
+
         self.level_surface = pygame.Surface(mapRender.get_size())
 
     def add_entity(self, entity, kinds=None):
@@ -51,6 +57,7 @@ class World:
         return self.map_surface.get_size()
 
     def process(self, time_passed):
+        self.viewport.move(time_passed)
         for entity in self.entities['all']:
             entity.process(time_passed)
 
@@ -84,12 +91,11 @@ class World:
     def render(self, surface):
         player = self.get_player()
         if player:
-            old_left = self.viewport.left
-            old_top = self.viewport.top
-            self.viewport.center = player.rect.center
-            self.viewport.clamp_ip(self.level_surface.get_rect())
-            diff_left = self.viewport.left - old_left
-            diff_top = self.viewport.top - old_top
+            old_left = self.viewport.get().left
+            old_top = self.viewport.get().top
+            self.viewport.center(player.rect.center, self.level_surface.get_rect())
+            diff_left = self.viewport.get().left - old_left
+            diff_top = self.viewport.get().top - old_top
             self.basement['x'] += int(diff_left * 0.3)
             self.basement['y'] += int(diff_top * 0.3)
 
@@ -97,12 +103,12 @@ class World:
             self.basement['image'],
             (self.basement['x'], self.basement['y'])
         )
-        self.level_surface.blit(self.map_surface, self.viewport, self.viewport)
+        self.level_surface.blit(self.map_surface, self.viewport.get(), self.viewport.get())
 
         for entity in self.entities['all']:
             entity.render(self.level_surface)
 
-        surface.blit(self.level_surface, (0, 0), self.viewport)
+        surface.blit(self.level_surface, (0, 0), self.viewport.get())
 
     def get_close_entities(self, group, location, close=100):
         return [e for e in self.entities[group]

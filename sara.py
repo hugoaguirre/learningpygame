@@ -32,18 +32,38 @@ class Sara(Entity):
         self.weapon = Weapon(self, world)
 
         self.life = 3
+        self.auto = False
         self.image_reload = pygame.image.load(RELOAD_BUTTON_IMAGE_FILENAME).convert_alpha()
         self.show_reload = False
 
     def process(self, time_passed):
         self.open_doors()
+        self.activate_triggers()
         super(Sara, self).process(time_passed)
 
     def open_doors(self):
         for door in self.world.get_close_entities('doors', self.get_location()):
             door.open()
 
+    def activate_triggers(self):
+        for trigger in self.world.get_close_entities('triggers', self.get_location(), 50):
+            if trigger.props['action'] == 'move_camera':
+                trigger.props['action'] = None
+                self.world.viewport.lock()
+                self.world.viewport.move_to(
+                    Vector(int(trigger.props['move_camera_x']),
+                           int(trigger.props['move_camera_y'])),
+                    on_arrival=lambda: (trigger.set_passable(False), self.set_auto(False))
+                )
+                self.auto_move(self.get_location() - Vector(128, 0))
+
+    def set_auto(self, auto):
+        self.auto = auto
+
     def process_events(self, events):
+        if self.auto:
+            return
+
         pressed_keys = pygame.key.get_pressed()
         direction = Vector(0, 0)
         if pressed_keys[pygame.K_LEFT]:
@@ -76,6 +96,10 @@ class Sara(Entity):
     def fire(self):
         if not self.weapon.fire():
             self.show_reload = True
+
+    def auto_move(self, destination):
+        self.auto = True
+        self.set_destination(destination)
 
     def receive_hit(self):
         '''Perform actions when player receive hit, return boolean

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="56" height="27" tilewidth="64" tileheight="64" backgroundcolor="#ff0080" nextobjectid="88">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="56" height="27" tilewidth="64" tileheight="64" backgroundcolor="#ff0080" nextobjectid="90">
  <tileset firstgid="1" name="sara" tilewidth="64" tileheight="64" tilecount="35" columns="7">
   <image source="../images/tileset.png" trans="ffffff" width="448" height="320"/>
  </tileset>
@@ -107,5 +107,12 @@
   <object id="47" name="door" type="door" x="3392" y="640" width="64" height="64"/>
   <object id="48" name="door" type="door" x="3392" y="896" width="64" height="64"/>
   <object id="49" name="door" type="door" x="2816" y="1344" width="64" height="64"/>
+  <object id="88" name="trigger" x="770" y="1287" width="9.19732" height="109.532">
+   <properties>
+    <property name="action" value="move_camera"/>
+    <property name="move_camera_x" type="int" value="0"/>
+    <property name="move_camera_y" type="int" value="1080"/>
+   </properties>
+  </object>
  </objectgroup>
 </map>

@@ -18,8 +18,10 @@ class Entity(pygame.sprite.Sprite):
                  location=None,
                  destination=None,
                  speed=0,
+                 props=None,
                  kill_on_leaving_screen=False):
         super(Entity, self).__init__()
+        self.props = props
         self.world = world
         self.name = name
         if not image and spritesheet:

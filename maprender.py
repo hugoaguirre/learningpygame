@@ -51,6 +51,7 @@ class MapRender:
                             name,
                             rect=pygame.Rect(left, top, width, height),
                             location=Vector(left, top),
+                            props=properties['properties'],
                             **kwargs
                         )
                         entities.append(entity)
