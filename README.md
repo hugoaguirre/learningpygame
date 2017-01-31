@@ -1,9 +1,11 @@
 # learningpygame
 Having fun with pygame
 
-![alt tag](https://c1.staticflickr.com/1/373/32294204791_0dc815d79c_c.jpg)
+![screenshot](https://i.imgur.com/hgu6qrM.png)
+![screenshot](https://i.imgur.com/GfOgAyF.png)
+![screenshot](https://i.imgur.com/CWREJyl.png)
 
-## Install dependencies
+# Install dependencies
 
 You need to have pip installed, refer to https://pip.pypa.io/en/stable/installing/ for installation instructions.
 
