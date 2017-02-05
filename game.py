@@ -58,14 +58,7 @@ class Game:
         self.possible_enemies[100] = self.create_robot
 
         while not should_quit:
-            if randint(1, 100) == 1:
-                # Create an enemy
-                hard = randint(0, 99)
-                for enemy_creator in self.possible_enemies[hard:]:
-                    if enemy_creator:
-                        enemy_creator()
-
-
+            self.create_enemies()
             self.process_events()
             seconds_passed = self.clock.tick(60) / 1000.0
             should_quit = self.world.process(seconds_passed)
@@ -77,8 +70,15 @@ class Game:
 
         # Quit game
         self.show_game_over()
-
         menu.MainMenu(self.screen)
+
+    def create_enemies(self):
+        if randint(1, 100) == 1:
+            # Create an enemy
+            hard = randint(0, 99)
+            for enemy_creator in self.possible_enemies[hard:]:
+                if enemy_creator:
+                    enemy_creator()
 
     def process_events(self):
         events = pygame.event.get()
@@ -166,3 +166,26 @@ class Game:
                    int(trigger.props['move_camera_y'])),
             on_arrival=lambda: (onend(), tank.build_brain())
         )
+
+class Message:
+    def __init__(self, message, timeout=2, position=None):
+        self.timeout = timeout
+        self.time_passed = 0
+        self.surface = None
+        if pygame.font.get_init():
+            font = pygame.font.Font(settings['font'], 80)
+            self.surface = font.render(message, True, (255, 255, 255))
+            if position:
+                self.rect = self.surface.get_rect()
+                self.rect.center = position
+
+    def process(self, time_passed):
+        self.time_passed += time_passed
+        if self.time_passed > self.timeout:
+            self.surface = None
+            return False
+        return True
+
+    def render(self, surface):
+        if self.surface:
+            surface.blit(self.surface, self.rect)
