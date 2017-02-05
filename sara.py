@@ -45,8 +45,7 @@ class Sara(Entity):
 
     def open_doors(self):
         for door in self.world.get_close_entities('doors', self.get_location()):
-            if door.props.get('key', None) == None or door.props['key'] in self._keys:
-                door.open()
+            door.open(self._keys)
 
     def activate_triggers(self):
         for trigger in self.world.get_close_entities('triggers', self.get_location(), 50):

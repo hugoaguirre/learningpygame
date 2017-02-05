@@ -2,6 +2,7 @@ import pygame
 from os.path import join as path_join
 
 from entity import Entity
+from constants import DISPLAY_MESSAGE_EVENT
 
 
 class Door(Entity):
@@ -24,6 +25,18 @@ class Door(Entity):
         self.set_image(old_image)
         self.set_passable(False)
 
-    def open(self):
-        self.keep_open = True
-        self.set_passable(True)
+    def open(self, keys):
+        if self.props.get('key', None) is None or self.props['key'] in keys:
+            self.keep_open = True
+            self.set_passable(True)
+            message = self.props.get('message', None)
+        else:
+            message = self.props.get('locked_message', None)
+
+        if message:
+            event = pygame.event.Event(
+                DISPLAY_MESSAGE_EVENT, {
+                    'message': message
+                }
+            )
+            pygame.event.post(event)

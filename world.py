@@ -3,7 +3,7 @@ from os.path import join as path_join
 
 from entity import Entity
 from door import Door
-from constants import ENEMY_DESTROYED_EVENT
+from constants import ENEMY_DESTROYED_EVENT, DISPLAY_MESSAGE_EVENT
 from maprender import MapRender
 from settings import settings
 from viewport import Viewport
@@ -88,6 +88,15 @@ class World:
         key_collisions = pygame.sprite.spritecollide(self.get_player(), self.entities.get('keys', []), True, pygame.sprite.collide_rect)
         for key in key_collisions:
             self.get_player()._keys.append(key.props['key'])
+            message = key.props.get('message', None)
+            if message:
+                event = pygame.event.Event(
+                    DISPLAY_MESSAGE_EVENT, {
+                        'message': message
+                    }
+                )
+                pygame.event.post(event)
+
 
         if self.entities.get('blockers') and self.entities.get('shots'):
             for shot in self.entities['shots']:

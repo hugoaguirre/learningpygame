@@ -112,6 +112,7 @@
   <object id="49" name="door" type="door" x="2816" y="1344" width="64" height="64">
    <properties>
     <property name="key" type="int" value="1"/>
+    <property name="locked_message" value="You need a blue card to open this door"/>
    </properties>
   </object>
   <object id="88" name="trigger" x="768" y="1280" width="10" height="128">
@@ -124,6 +125,7 @@
   <object id="90" name="key" type="1" gid="36" x="2496" y="320" width="22" height="32">
    <properties>
     <property name="key" type="int" value="1"/>
+    <property name="message" value="You got a blue card"/>
    </properties>
   </object>
  </objectgroup>
