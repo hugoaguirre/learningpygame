@@ -29,6 +29,11 @@ class World:
             mapRender.get_object_entities('trigger', Entity, passable=True),
             ('triggers', )
         )
+        key_image = pygame.image.load('images/card.png')
+        self.add_entity(
+            mapRender.get_object_entities('key', Entity, passable=False, image=key_image),
+            ('keys', )
+        )
 
         # parallax this
         basement = mapRender.map_data.get_layer_by_name('basement')
@@ -65,7 +70,7 @@ class World:
     def detect_collisions(self):
         if (self.entities.get('enemies') and self.entities.get('ally_shots')):
             for enemy in self.entities['enemies']:
-                collisions = pygame.sprite.spritecollide(enemy, self.entities['ally_shots'], False, pygame.sprite.collide_mask)
+                collisions = pygame.sprite.spritecollide(enemy, self.entities['ally_shots'], True, pygame.sprite.collide_mask)
                 if collisions:
                     if enemy.receive_hit():
                         event = pygame.event.Event(ENEMY_DESTROYED_EVENT, enemy_class=enemy.__class__)
@@ -74,11 +79,15 @@ class World:
 
         if self.entities.get('enemy_shots') and not settings['debug']:
             for player in self.entities['player']:
-                collisions = pygame.sprite.spritecollide(player, self.entities['enemy_shots'], False, pygame.sprite.collide_mask)
+                collisions = pygame.sprite.spritecollide(player, self.entities['enemy_shots'], True, pygame.sprite.collide_mask)
                 if collisions:
                     if player.receive_hit():
                         player.kill()
                         return True  # should quit?
+
+        key_collisions = pygame.sprite.spritecollide(self.get_player(), self.entities.get('keys', []), True, pygame.sprite.collide_rect)
+        for key in key_collisions:
+            self.get_player()._keys.append(key.props['key'])
 
         if self.entities.get('blockers') and self.entities.get('shots'):
             for shot in self.entities['shots']:

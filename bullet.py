@@ -9,7 +9,7 @@ from constants import  COLOR_BLACK
 class Bullet(Entity):
     """ Make the bullets independant"""
 
-    SPEED = 300
+    SPEED = 500
     IMAGE_FILENAME = path_join("images", "laser.png")
 
     def __init__(self, world, flip=False, location=None):

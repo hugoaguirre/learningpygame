@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="56" height="27" tilewidth="64" tileheight="64" backgroundcolor="#ff0080" nextobjectid="90">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="56" height="27" tilewidth="64" tileheight="64" backgroundcolor="#ff0080" nextobjectid="92">
  <tileset firstgid="1" name="sara" tilewidth="64" tileheight="64" tilecount="35" columns="7">
   <image source="../images/tileset.png" trans="ffffff" width="448" height="320"/>
  </tileset>
+ <tileset firstgid="36" name="cards" tilewidth="22" tileheight="32" tilecount="1" columns="1">
+  <image source="../images/card.png" trans="000000" width="22" height="32"/>
+ </tileset>
  <imagelayer name="basement" offsetx="1468" offsety="1148">
-  <image source="../images/robotformation.png" width="1047" height="448"/>
+  <image source="../images/robotformation.png" width="1200" height="800"/>
  </imagelayer>
  <layer name="piso" width="56" height="27">
   <data encoding="csv">
@@ -106,12 +109,21 @@
   <object id="46" name="door" type="door" x="2176" y="640" width="64" height="64"/>
   <object id="47" name="door" type="door" x="3392" y="640" width="64" height="64"/>
   <object id="48" name="door" type="door" x="3392" y="896" width="64" height="64"/>
-  <object id="49" name="door" type="door" x="2816" y="1344" width="64" height="64"/>
+  <object id="49" name="door" type="door" x="2816" y="1344" width="64" height="64">
+   <properties>
+    <property name="key" type="int" value="1"/>
+   </properties>
+  </object>
   <object id="88" name="trigger" x="768" y="1280" width="10" height="128">
    <properties>
     <property name="action" value="boss_battle"/>
     <property name="move_camera_x" type="int" value="0"/>
     <property name="move_camera_y" type="int" value="1080"/>
+   </properties>
+  </object>
+  <object id="90" name="key" type="1" gid="36" x="2496" y="320" width="22" height="32">
+   <properties>
+    <property name="key" type="int" value="1"/>
    </properties>
   </object>
  </objectgroup>
