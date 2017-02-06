@@ -11,6 +11,7 @@ class MapRender:
         self.map_data = load_pygame(filename)
         self.map_surface = None
         self.blocker_entities = None
+        self.simple_map = self.simplify_map()
 
     def get_size(self):
         return (self.map_data.width * self.map_data.tilewidth,
@@ -56,3 +57,15 @@ class MapRender:
                         )
                         entities.append(entity)
         return entities
+
+    def simplify_map(self):
+        simple_map = [[True for _ in xrange(self.map_data.height)] for _ in xrange(self.map_data.width)]
+
+        for obj in [obj
+                    for layer in self.map_data.visible_layers if isinstance(layer, pytmx.TiledObjectGroup)
+                    for obj in layer if obj.name == 'blocker']:
+            for tile_x, tile_y in [(int(x / self.map_data.tilewidth), int(y / self.map_data.tileheight))
+                         for x in xrange(int(obj.x + self.map_data.tilewidth/2), int(obj.x + obj.width), int(self.map_data.tilewidth))
+                         for y in xrange(int(obj.y + self.map_data.tileheight/2), int(obj.y + obj.height), int(self.map_data.tileheight))]:
+                simple_map[tile_x][tile_y] = False
+        return simple_map
