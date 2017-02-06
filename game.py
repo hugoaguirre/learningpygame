@@ -11,7 +11,7 @@ from tank import Tank
 from world import World
 from vector import Vector
 from settings import settings
-from constants import ENEMY_DESTROYED_EVENT, SCREEN_SIZE, SONG_END_EVENT, BOSS_BATTLE_EVENT
+from constants import ENEMY_DESTROYED_EVENT, SCREEN_SIZE, SONG_END_EVENT, BOSS_BATTLE_EVENT, DISPLAY_MESSAGE_EVENT
 
 
 LIFE_IMAGE_FILENAME = path_join('images', 'heart.png')
@@ -46,6 +46,7 @@ class Game:
         for _ in xrange(settings['initial_robots']):
             self.create_robot()
 
+        self.messages = []
         self.possible_enemies = None
         self.init_enemy_creation()
         self.main()
@@ -58,19 +59,22 @@ class Game:
         self.possible_enemies[100] = self.create_robot
 
         while not should_quit:
-            self.create_enemies()
             self.process_events()
-            seconds_passed = self.clock.tick(60) / 1000.0
-            should_quit = self.world.process(seconds_passed)
-            self.world.render(self.screen)
-
-            if not should_quit:
-                self.render()
+            should_quit = self.process()
+            self.render(should_quit)
             pygame.display.update()
 
         # Quit game
         self.show_game_over()
         menu.MainMenu(self.screen)
+
+    def process(self):
+        seconds_passed = self.clock.tick(60) / 1000.0
+        for message in self.messages:
+            message.process(seconds_passed)
+        self.create_enemies()
+        should_quit = self.world.process(seconds_passed)
+        return should_quit
 
     def create_enemies(self):
         if randint(1, 100) == 1:
@@ -93,16 +97,24 @@ class Game:
                     pass  # no score
             if event.type == BOSS_BATTLE_EVENT:
                 self.start_boss_battle(event.trigger, event.on_end_callback)
+            if event.type == DISPLAY_MESSAGE_EVENT:
+                self.messages.append(Message(event.message))
         self.world.process_events(events)
 
-    def render(self):
-        '''Use it to render HUD'''
-        for i in xrange(0, self.sara.life):
-            x = self.images['life'].get_width() * i + 5 * (i + 1)
-            self.screen.blit(self.images['life'], (x, 10))
+    def render(self, should_quit):
+        self.world.render(self.screen)
 
-        # Render score
-        self._render_surface_score()
+        if not should_quit:
+            # Use it to render HUD
+            for i in xrange(0, self.sara.life):
+                x = self.images['life'].get_width() * i + 5 * (i + 1)
+                self.screen.blit(self.images['life'], (x, 10))
+
+            # Render score
+            self._render_surface_score()
+
+            for message in self.messages:
+                message.render(self.screen)
 
     def _render_surface_score(self, prefix=''):
         try:
@@ -168,7 +180,7 @@ class Game:
         )
 
 class Message:
-    def __init__(self, message, timeout=2, position=None):
+    def __init__(self, message, timeout=2, position=(400, 300)):
         self.timeout = timeout
         self.time_passed = 0
         self.surface = None
