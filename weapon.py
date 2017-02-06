@@ -20,7 +20,7 @@ class Weapon():
         self.bullets_fired = 0
         self.reloading = False
 
-    def fire(self):
+    def fire(self, direction):
         player_location = self.player.get_location()
         x = player_location.x + (0 if self.player.is_flip() else self.player.get_width())
         y = player_location.y + self.player.get_height() / 2
@@ -30,7 +30,7 @@ class Weapon():
         y += 2
 
         if self.bullets_fired <= self.magazine_size:
-            bullet = Bullet(self.world, flip=self.player.is_flip(), location=Vector(x, y))
+            bullet = Bullet(self.world, flip=not self.player.is_flip(), location=Vector(x, y), direction=direction)
             self.bullets_fired += 1
             self.world.add_entity(bullet, ('ally_shots', 'shots'))
             sfx.play_laser2()

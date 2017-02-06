@@ -24,10 +24,6 @@ class Entity(pygame.sprite.Sprite):
         self.props = props
         self.world = world
         self.name = name
-        if not image and spritesheet:
-            self.spritesheet = spritesheet
-            image = spritesheet.get_image(0)
-
         self._destination = destination
         self._passable = passable
         self._can_leave_screen = can_leave_screen
@@ -35,17 +31,20 @@ class Entity(pygame.sprite.Sprite):
 
         self._speed = speed
 
-        # Needed by pygame
-        if image:
-            self.rect = image.get_rect()
-        else:
-            self.rect = rect
-
         self._image = None
         self._is_flip = flip
         self._flash = None
         if image:
             self.set_image(image)
+        elif spritesheet:
+            self.set_spritesheet(spritesheet)
+            image = spritesheet.get_image(0)
+
+        # Needed by pygame
+        if image:
+            self.rect = image.get_rect()
+        else:
+            self.rect = rect
 
         if not location:
             self.set_location(Vector(0, 0))
@@ -89,6 +88,13 @@ class Entity(pygame.sprite.Sprite):
             self._is_flip = False  # Force flip
             self.flip()
         self.mask = pygame.mask.from_surface(self._image)
+
+    def set_spritesheet(self, spritesheet):
+        self._spritesheet = spritesheet
+        self.set_image(spritesheet.get_image(0))
+
+    def get_spritesheet(self):
+        return self._spritesheet
 
     def get_image(self):
         return self._image
