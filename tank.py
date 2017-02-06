@@ -5,7 +5,7 @@ from entity import Entity
 from vector import Vector
 from statemachine import StateMachine, State
 from random import randint
-from constants import SCREEN_SIZE
+from constants import SCREEN_SIZE, END_LEVEL_EVENT
 
 
 class Tank(Entity):
@@ -56,6 +56,11 @@ class Tank(Entity):
         location = self.get_location()
         self.spark.set_location(location + Vector(63, 106))
         self.world.add_entity(self.spark, ('enemy_shots',))
+
+    def kill(self):
+        e = pygame.event.Event(END_LEVEL_EVENT)
+        pygame.event.post(e)
+        super(Tank, self).kill()
 
 
 class TankStateDodging(State):

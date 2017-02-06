@@ -12,6 +12,7 @@ def init_screen():
     pygame.mouse.set_visible(0)
     pygame.display.set_caption('Sara\'s shooter')
     pygame.display.set_icon(pygame.image.load(path_join('images', 'icon.png')))
+    pygame.mixer.pre_init(44100, -16, 2, 1024*4)
     return pygame.display.set_mode(SCREEN_SIZE, pygame.DOUBLEBUF)
 
 

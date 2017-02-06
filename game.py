@@ -11,7 +11,7 @@ from tank import Tank
 from world import World
 from vector import Vector
 from settings import settings
-from constants import ENEMY_DESTROYED_EVENT, SCREEN_SIZE, SONG_END_EVENT, BOSS_BATTLE_EVENT, DISPLAY_MESSAGE_EVENT
+from constants import ENEMY_DESTROYED_EVENT, SCREEN_SIZE, SONG_END_EVENT, BOSS_BATTLE_EVENT, DISPLAY_MESSAGE_EVENT, END_LEVEL_EVENT, END_GAME_EVENT
 
 
 LIFE_IMAGE_FILENAME = path_join('images', 'heart.png')
@@ -21,7 +21,6 @@ class Game:
     def __init__(self, screen):
         self.screen = screen
 
-#        pygame.mixer.pre_init(44100, -16, 2, 1024*4)
         pygame.mixer.music.load("music/intro.wav")
         pygame.mixer.music.set_endevent(SONG_END_EVENT)
         pygame.mixer.music.play(1)
@@ -59,8 +58,8 @@ class Game:
         self.possible_enemies[100] = self.create_robot
 
         while not should_quit:
-            self.process_events()
-            should_quit = self.process()
+            should_quit = self.process_events()
+            should_quit |= self.process()
             self.render(should_quit)
             pygame.display.update()
 
@@ -99,7 +98,13 @@ class Game:
                 self.start_boss_battle(event.trigger, event.on_end_callback)
             if event.type == DISPLAY_MESSAGE_EVENT:
                 self.messages.append(Message(event.message))
+            if event.type == END_LEVEL_EVENT:
+                self.end_level()
+            if event.type == END_GAME_EVENT:
+                return True
+
         self.world.process_events(events)
+        return False
 
     def render(self, should_quit):
         self.world.render(self.screen)
@@ -157,8 +162,10 @@ class Game:
 
     def start_boss_battle(self, trigger, onend=None):
         trigger.props['action'] = None
-        for enemy in self.world.entities['enemies']:
+        for enemy in self.world.entities.get('enemies', []):
             enemy.kill()
+        for laser in self.world.entities.get('enemy_shots', []):
+            laser.kill()
         pygame.mixer.music.load('music/bossbattle.wav')
         pygame.mixer.music.play(-1)
         self.init_enemy_creation()  # No more enemy creation
@@ -178,6 +185,17 @@ class Game:
                    int(trigger.props['move_camera_y'])),
             on_arrival=lambda: (onend(), tank.build_brain())
         )
+
+    def end_level(self):
+        for shot in self.world.entities.get('ally_shots', []):
+            shot.kill()
+        for shot in self.world.entities.get('enemy_shots', []):
+            shot.kill()
+        pygame.mixer.music.load('music/end.wav')
+        pygame.mixer.music.set_endevent(END_GAME_EVENT)
+        pygame.mixer.music.play(0)
+        self.sara.auto_move(Vector(360, 1350))
+        self.sara.set_spritesheet(self.sara.ss['down'])
 
 class Message:
     def __init__(self, message, timeout=2, position=(400, 300)):
