@@ -13,13 +13,21 @@ class Sara(Entity):
 
     SPEED = 250
     ANIMATION_TICKS = 5
-    IMAGE_FILENAME = path_join('images', 'sara.png')
+    IMAGE_FILENAME = path_join('images', 'newsara.png')
+    DOWN_IMAGE_FILENAME = path_join('images', 'saradown.png')
+    UP_IMAGE_FILENAME = path_join('images', 'saraup.png')
 
     def __init__(self, world):
         ss = Spritesheet(Sara.IMAGE_FILENAME, 44)
+        self.ss = {
+            'left': ss,
+            'right': ss,
+            'up': Spritesheet(Sara.UP_IMAGE_FILENAME, 44),
+            'down': Spritesheet(Sara.DOWN_IMAGE_FILENAME, 44)
+        }
         super(Sara, self).__init__(
             world, 'sara',
-            spritesheet=ss,
+            spritesheet=self.ss['right'],
             passable=False,
             can_leave_screen=True,
             speed=Sara.SPEED
@@ -37,6 +45,8 @@ class Sara(Entity):
         self.image_reload = pygame.image.load(RELOAD_BUTTON_IMAGE_FILENAME).convert_alpha()
         self.show_reload = False
         self._keys = []
+        self.face_to = 'right'
+        self.flip()
 
     def process(self, time_passed):
         self.open_doors()
@@ -72,10 +82,10 @@ class Sara(Entity):
         direction = Vector(0, 0)
         if pressed_keys[pygame.K_LEFT]:
             direction.x = -1
-            self.flip()
+            self.reverse_flip()
         elif pressed_keys[pygame.K_RIGHT]:
             direction.x = +1
-            self.reverse_flip()
+            self.flip()
 
         if pressed_keys[pygame.K_UP]:
             direction.y = -1
@@ -88,6 +98,22 @@ class Sara(Entity):
 
         direction.normalize()
 
+        old_face_to = self.face_to
+        facing = list()
+        if direction.x > 0:
+            facing.append('right')
+        elif direction.x < 0:
+            facing.append('left')
+
+        if direction.y > 0:
+            facing.append('down')
+        elif direction.y < 0:
+            facing.append('up')
+
+        if facing and self.face_to not in facing:
+            self.face_to = facing[0]
+            self.set_spritesheet(self.ss[self.face_to])
+
         self.set_destination(self.get_location() + Vector(
             direction.x * self.get_speed(),
             direction.y * self.get_speed()))
@@ -98,7 +124,7 @@ class Sara(Entity):
                 self.fire()
 
     def fire(self):
-        if not self.weapon.fire():
+        if not self.weapon.fire(self.face_to):
             self.show_reload = True
 
     def auto_move(self, destination):
@@ -146,4 +172,4 @@ class Sara(Entity):
                 self.animation_time -= 1
             else:
                 self.animation = 0
-        self.set_image(self.spritesheet.get_image(self.animation))
+        self.set_image(self.get_spritesheet().get_image(self.animation))
