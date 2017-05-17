@@ -31,7 +31,7 @@ class World:
         )
         key_image = pygame.image.load('images/card.png')
         self.add_entity(
-            mapRender.get_object_entities('key', Entity, passable=False, image=key_image),
+            mapRender.get_object_entities('key', Entity, passable=True, image=key_image),
             ('keys', )
         )
 

@@ -164,6 +164,7 @@ class Sara(Entity):
             else:
                 self.animation_time -= 1
         else:
+            self.set_auto(False)
             if self.animation in (1, 2, 3):  # was just moving
                 self.animation_time = self.ANIMATION_TICKS / 2  # shorter stop animation
                 self.animation = 4
