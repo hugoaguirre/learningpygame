@@ -1,0 +1,33 @@
+Comencé a escribir este juego para entretenerme por un tiempo y aprender algo de
+desarrollo de videojuegos y pygame, para que tenga un propósito más noble decidí
+convertirlo en una guía para que otros puedan aprender. Ya hay un montón de mate
+rial, el cual yo utilicé, casi todo en inglés por eso lo escribiré en espanol.
+
+Iré explicando todo lo que sea posible de la manera más clara en comentarios en
+el mismo código. Es necesario que sepas PYTHON BÁSICO, pues no es viable expli
+carlo aquí.
+
+Intentaré explicar pygame, las técnicas que uso en el desarrollo del juego, las
+decisiones de diseno que tomé en el juego, python medio-avanzado y quizás alguna
+otra curiosa que valga la pena comentar.
+
+Si crees que hace falta explicar algo o aclarar una explicación que ya esté por
+favor levanta un ticket en el repositorio para hacer algo al respecto.
+
+EMPECEMOS
+
+Para comenzar hay que jugar el juego, lo más sencillo es ejecutar los siguientes
+comandos, (necesitas tener instalado python y pip antes):
+
+$ make install
+$ make run
+
+Las instrucciones son para Linux, ya deberías tener make para poder correr los
+comandos si no te toca instalarlo.
+
+Puedes jugar un poco y cuando termines la partida continua con este archivo.
+
+...
+
+Me parece más sencillo ir explicando todo tal como se va ejecutando el código,
+entonces te pido que abras main.py para comenzar a entender este juego. Suerte.

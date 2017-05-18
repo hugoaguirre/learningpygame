@@ -1,30 +1,64 @@
+## Esto podría ser un código mejor organizado pero... meh
+## Este archivo tiene una clase muy importante para el juego
+## Game representa el juego en sí, el concepto abstracto del juego
+## que orquesta todo lo que está pasando.
+## A esta clase vamos a regresar muchas veces, pues es la que tiene
+## el ciclo principal del juego, ese que da vueltas 30 veces por segundo,
+## también mantiene unidas otras entidades como el mundo, mensajes, las entradas
+## del usuario etc.
+
+## un monton de imports
 import pygame
 from os import remove as os_remove
 from os.path import join as path_join
 from PIL import Image, ImageFilter
 from random import randint
 
+## ¿ya notaste que separo los imports en dos bloques?
+## el primero son de la libreria estándar y paquetes de terceros
+## este segundo bloque son módulos que están en este mismo paquete
+## es una convención usual en los programas de python
+from constants import (
+    BOSS_BATTLE_EVENT,
+    DISPLAY_MESSAGE_EVENT,
+    END_GAME_EVENT,
+    END_LEVEL_EVENT,
+    ENEMY_DESTROYED_EVENT,
+    SCREEN_SIZE,
+    SONG_END_EVENT
+)
 import menu
-from sara import Sara
 from robot import Robot
-from tank import Tank
-from world import World
-from vector import Vector
+from sara import Sara
 from settings import settings
-from constants import ENEMY_DESTROYED_EVENT, SCREEN_SIZE, SONG_END_EVENT, BOSS_BATTLE_EVENT, DISPLAY_MESSAGE_EVENT, END_LEVEL_EVENT, END_GAME_EVENT
+from tank import Tank
+from vector import Vector
+from world import World
 
 
 LIFE_IMAGE_FILENAME = path_join('images', 'heart.png')
 
 
+## La clase Game se va a instanciar una sola vez durante toda la ejecución del
+## programa, los valores que se inicialian en el cosntructor se van a utilizar
+## durante todo el juego e incluyen valores como el jugador, los enemigos, los
+## mensajes etc.
 class Game:
     def __init__(self, screen):
+        ## De nuevo recibimos la pantalla que creamos en main.py, pasamos a
+        ## menu.py y la recibimos acá. Vamos a usarla mucho por aquí
         self.screen = screen
 
+        ## Cambiamos de música, comenzando con un intro
         pygame.mixer.music.load("music/intro.wav")
+        ## Vamos a ver un poco más sobre eventos, este evento es especial
+        ## y se activa cuando se termina la canción, por ahora debemos saber
+        ## eso. Más adelante veremos como se manejan los eventos del juego.
         pygame.mixer.music.set_endevent(SONG_END_EVENT)
         pygame.mixer.music.play(1)
 
+        ## El puntaje se lleva a lo largo de todo el juego, es responsabilidad
+        ## de Game llevar el puntaje
         self.score = 0
 
         self.clock = pygame.time.Clock()
