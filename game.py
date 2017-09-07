@@ -14,14 +14,19 @@ from settings import settings
 from constants import ENEMY_DESTROYED_EVENT, SCREEN_SIZE, SONG_END_EVENT, BOSS_BATTLE_EVENT, DISPLAY_MESSAGE_EVENT, END_LEVEL_EVENT, END_GAME_EVENT
 
 
-LIFE_IMAGE_FILENAME = path_join('images', 'heart.png')
+LIFE_IMAGE_FILENAME = path_join('assets', 'images', 'heart.png')
+
+MUSIC_BOSS_BATTLE = path_join('assets', 'music', 'bossbattle.wav')
+MUSIC_MAIN = path_join('assets', 'music', 'main.wav')
+MUSIC_INTRO = path_join('assets', 'music', 'intro.wav')
+MUSIC_END = path_join('assets', 'music', 'end.wav')
 
 
 class Game:
     def __init__(self, screen):
         self.screen = screen
 
-        pygame.mixer.music.load("music/intro.wav")
+        pygame.mixer.music.load(MUSIC_INTRO)
         pygame.mixer.music.set_endevent(SONG_END_EVENT)
         pygame.mixer.music.play(1)
 
@@ -87,7 +92,7 @@ class Game:
         events = pygame.event.get()
         for event in events:
             if event.type == SONG_END_EVENT and not settings['debug']:
-                pygame.mixer.music.load('music/main.wav')
+                pygame.mixer.music.load(MUSIC_MAIN)
                 pygame.mixer.music.play(-1)
             if event.type == ENEMY_DESTROYED_EVENT:
                 try:
@@ -166,7 +171,7 @@ class Game:
             enemy.kill()
         for laser in self.world.entities.get('enemy_shots', []):
             laser.kill()
-        pygame.mixer.music.load('music/bossbattle.wav')
+        pygame.mixer.music.load(MUSIC_BOSS_BATTLE)
         pygame.mixer.music.play(-1)
         self.init_enemy_creation()  # No more enemy creation
 
@@ -191,7 +196,7 @@ class Game:
             shot.kill()
         for shot in self.world.entities.get('enemy_shots', []):
             shot.kill()
-        pygame.mixer.music.load('music/end.wav')
+        pygame.mixer.music.load(MUSIC_END)
         pygame.mixer.music.set_endevent(END_GAME_EVENT)
         pygame.mixer.music.play(0)
         self.sara.auto_move(Vector(360, 1350))

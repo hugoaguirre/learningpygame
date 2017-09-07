@@ -5,7 +5,7 @@ from statemachine import StateMachine, State
 from vector import Vector
 
 
-SPRITE_IMAGE_FILENAME = "images/spider.png"
+SPRITE_IMAGE_FILENAME = "assets/images/spider.png"
 
 
 class Spider(Entity):
@@ -98,7 +98,7 @@ class SpiderStateWaiting(State):
 class Thunder(Entity):
 
     SPEED = 1200
-    IMAGE_FILENAME = 'images/thunder.png'
+    IMAGE_FILENAME = 'assets/images/thunder.png'
 
     def __init__(self, world):
         sprite = pygame.image.load(Thunder.IMAGE_FILENAME).convert_alpha()

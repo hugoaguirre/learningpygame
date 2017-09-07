@@ -10,7 +10,7 @@ class Bullet(Entity):
     """ Make the bullets independant"""
 
     SPEED = 500
-    IMAGE_FILENAME = path_join("images", "laser.png")
+    IMAGE_FILENAME = path_join('assets', "images", "laser.png")
 
     def __init__(self, world, flip=False, location=None, direction=None):
         sprite = pygame.image.load(Bullet.IMAGE_FILENAME).convert()

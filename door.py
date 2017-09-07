@@ -6,8 +6,8 @@ from constants import DISPLAY_MESSAGE_EVENT
 
 
 class Door(Entity):
-    CLOSED_IMAGE_FILENAME = path_join('images', 'closed_door.png')
-    OPEN_IMAGE_FILENAME = path_join('images', 'open_door.png')
+    CLOSED_IMAGE_FILENAME = path_join('assets', 'images', 'closed_door.png')
+    OPEN_IMAGE_FILENAME = path_join('assets', 'images', 'open_door.png')
 
     def __init__(self, *args, **kwargs):
         sprite = pygame.image.load(Door.CLOSED_IMAGE_FILENAME).convert_alpha()

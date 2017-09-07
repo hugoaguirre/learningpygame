@@ -13,11 +13,11 @@ from constants import SCREEN_SIZE
 class Robot(Entity):
     SPEED = 100
     SCORE = 100
-    IMAGE_FILENAME = path_join("images", "robot.png")
+    IMAGE_FILENAME = path_join('assets', "images", "robot.png")
 
     def __init__(self, world, location=None):
         # FIX integrate pyganim as part on entity
-        images = pyganim.getImagesFromSpriteSheet(path_join('images', 'anirobot.png'), rows=1, cols=3, rects=[])
+        images = pyganim.getImagesFromSpriteSheet(path_join('assets', 'images', 'anirobot.png'), rows=1, cols=3, rects=[])
         frames = list(zip(images, [200, 200, 200]))
         self.animObj = pyganim.PygAnimation(frames)
         self.animObj.play()
@@ -151,7 +151,7 @@ class RobotStateWaiting(State):
 class Laser(Entity):
 
     SPEED = 600
-    IMAGE_FILENAME = path_join('images', 'redlaser.png')
+    IMAGE_FILENAME = path_join('assets', 'images', 'redlaser.png')
 
     def __init__(self, world, flip=False):
         sprite = pygame.image.load(Laser.IMAGE_FILENAME).convert_alpha()

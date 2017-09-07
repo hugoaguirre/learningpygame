@@ -10,7 +10,7 @@ from viewport import Viewport
 
 
 class World:
-    LEVEL_ONE_FILENAME = path_join('levels', 'one.tmx')
+    LEVEL_ONE_FILENAME = path_join('assets', 'levels', 'one.tmx')
 
     def __init__(self):
         self.entities = {'all': pygame.sprite.Group()}
@@ -29,7 +29,7 @@ class World:
             mapRender.get_object_entities('trigger', Entity, passable=True),
             ('triggers', )
         )
-        key_image = pygame.image.load('images/card.png')
+        key_image = pygame.image.load(path_join('assets', 'images', 'card.png'))
         self.add_entity(
             mapRender.get_object_entities('key', Entity, passable=True, image=key_image),
             ('keys', )
@@ -38,7 +38,7 @@ class World:
         # parallax this
         basement = mapRender.map_data.get_layer_by_name('basement')
         self.basement = {
-            'image': pygame.image.load(basement.source.replace('../', '')),
+            'image': pygame.image.load(basement.source.replace('../', 'assets/')),
             'x': 800,
             'y': 650,
         }
