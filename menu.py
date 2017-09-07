@@ -1,4 +1,5 @@
 from sys import exit as sys_exit
+import os
 import ezmenu
 import pygame
 import game
@@ -25,7 +26,7 @@ class MainMenu:
         self.main()
 
     def main(self):
-        pygame.mixer.music.load("music/menu.wav")
+        pygame.mixer.music.load(os.path.join('assets', 'music', 'menu.wav'))
         pygame.mixer.music.play(-1)
 
         while True:

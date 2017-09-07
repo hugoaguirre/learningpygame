@@ -1,5 +1,6 @@
 import pyganim
 import pygame
+import os
 
 from entity import Entity
 from vector import Vector
@@ -11,9 +12,10 @@ from constants import SCREEN_SIZE, END_LEVEL_EVENT
 class Tank(Entity):
     SCORE = 1000
     SPEED = 300
+    TANK_IMAGE = os.path.join('assets', 'images', 'tank.png')
 
     def __init__(self,*args, **kwargs):
-        images = pyganim.getImagesFromSpriteSheet('images/tank.png', rows=1, cols=4, rects=[])
+        images = pyganim.getImagesFromSpriteSheet(self.TANK_IMAGE, rows=1, cols=4, rects=[])
         frames = list(zip(images[:3], [200, 200, 200]))
         self.animObj = pyganim.PygAnimation(frames)
         self.animObj.play()
@@ -118,7 +120,7 @@ class TankStateWaiting(State):
             self.time_passed = 0
             return 'dodging'
 
-SPARK_IMAGE_FILENAME = 'images/redspark.png'
+SPARK_IMAGE_FILENAME = os.path.join('assets', 'images', 'redspark.png')
 
 
 class Spark(Entity):

@@ -7,15 +7,15 @@ from spritesheet import Spritesheet
 from weapon import Weapon
 from constants import BOSS_BATTLE_EVENT
 
-RELOAD_BUTTON_IMAGE_FILENAME = path_join('images', 'button_r.png')
+RELOAD_BUTTON_IMAGE_FILENAME = path_join('assets', 'images', 'button_r.png')
 
 class Sara(Entity):
 
     SPEED = 250
     ANIMATION_TICKS = 5
-    IMAGE_FILENAME = path_join('images', 'newsara.png')
-    DOWN_IMAGE_FILENAME = path_join('images', 'saradown.png')
-    UP_IMAGE_FILENAME = path_join('images', 'saraup.png')
+    IMAGE_FILENAME = path_join('assets', 'images', 'newsara.png')
+    DOWN_IMAGE_FILENAME = path_join('assets', 'images', 'saradown.png')
+    UP_IMAGE_FILENAME = path_join('assets', 'images', 'saraup.png')
 
     def __init__(self, world):
         ss = Spritesheet(Sara.IMAGE_FILENAME, 44)
