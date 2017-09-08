@@ -130,11 +130,11 @@ class Sara(Entity):
         self.auto = True
         self.set_destination(destination)
 
-    def receive_hit(self):
+    def receive_hit(self, damage=1):
         '''Perform actions when player receive hit, return boolean
         indicating if entity should die'''
 
-        self.life -= 1
+        self.life -= damage
         self.flash()
         return self.life == 0
 

@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="56" height="27" tilewidth="64" tileheight="64" backgroundcolor="#ff0080" nextobjectid="92">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="56" height="27" tilewidth="64" tileheight="64" backgroundcolor="#ff0080" nextobjectid="96">
  <tileset firstgid="1" name="sara" tilewidth="64" tileheight="64" tilecount="35" columns="7">
   <image source="../images/tileset.png" trans="ffffff" width="448" height="320"/>
  </tileset>
  <tileset firstgid="36" name="cards" tilewidth="22" tileheight="32" tilecount="1" columns="1">
   <image source="../images/card.png" trans="000000" width="22" height="32"/>
+ </tileset>
+  <tileset firstgid="37" name="cards" tilewidth="30" tileheight="32" tilecount="1" columns="1">
+  <image source="../images/health_potion.png" trans="000000" width="30" height="32"/>
  </tileset>
  <imagelayer name="basement" offsetx="1468" offsety="1148">
   <image source="../images/robotformation.png" width="1200" height="800"/>
@@ -122,6 +125,16 @@
    <properties>
     <property name="key" type="int" value="1"/>
     <property name="message" value="You got a blue card"/>
+   </properties>
+  </object>
+  <object id="93" name="potions" type="health" gid="37" x="2299.67" y="230.667" width="30" height="32">
+   <properties>
+    <property name="message" value="You recover one point of health"/>
+   </properties>
+  </object>
+  <object id="95" name="potions" type="health" gid="37" x="860.761" y="788.849" width="30" height="32">
+   <properties>
+    <property name="message" value="You recover one point of health"/>
    </properties>
   </object>
  </objectgroup>

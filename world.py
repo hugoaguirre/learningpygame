@@ -35,6 +35,12 @@ class World:
             ('keys', )
         )
 
+        health_potion_image = pygame.image.load(path_join('assets', 'images', 'health_potion.png'))
+        self.add_entity(
+            mapRender.get_object_entities('potions', Entity, passable=True, image=health_potion_image),
+            ('potions', )
+        )
+
         # parallax this
         basement = mapRender.map_data.get_layer_by_name('basement')
         self.basement = {
@@ -97,6 +103,18 @@ class World:
                 )
                 pygame.event.post(event)
 
+        # TODO this collide could be a mask
+        potion_collisions = pygame.sprite.spritecollide(self.get_player(), self.entities.get('potions', []), True, pygame.sprite.collide_rect)
+        for potion in potion_collisions:
+            self.get_player().receive_hit(-1)
+            message = potion.props.get('message', None)
+            if message:
+                event = pygame.event.Event(
+                    DISPLAY_MESSAGE_EVENT, {
+                        'message': message
+                    }
+                )
+                pygame.event.post(event)
 
         if self.entities.get('blockers') and self.entities.get('shots'):
             for shot in self.entities['shots']:
