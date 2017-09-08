@@ -1,36 +1,33 @@
 import pygame
-from entity import Entity
 from random import randint
+from os.path import join as path_join
+
+from entity import Entity
 from statemachine import StateMachine, State
 from vector import Vector
 
 
-SPRITE_IMAGE_FILENAME = "assets/images/spider.png"
-
-
 class Spider(Entity):
-
-    SPEED = 100
+    SPEED = 1000
     SCORE = 500
+    IMAGE_FILENAME = path_join('assets', 'images', 'spider.png')
 
     def __init__(self, world):
-        sprite = pygame.image.load(SPRITE_IMAGE_FILENAME).convert_alpha()
+        sprite = pygame.image.load(Spider.IMAGE_FILENAME).convert_alpha()
         super(Spider, self).__init__(
             world, 'Spider', sprite,
             brain=self._build_brain(),
             speed=Spider.SPEED,
         )
 
-        self.set_destination(self.get_location())
-
     def _build_brain(self):
         brain = StateMachine()
 
         brain.add_state(SpiderStateShoting(self))
         brain.add_state(SpiderStateWaiting(self))
-        brain.add_state(SpiderStateDodging(self))
+        brain.add_state(SpiderStateChasing(self))
 
-        brain.set_state('waiting')
+        brain.set_state('chasing')
         return brain
 
     def shoot(self):
@@ -38,34 +35,32 @@ class Spider(Entity):
         thunder.set_location(self.get_location() + Vector(31, 34))
         self.world.add_entity(thunder, ('enemy_shots', 'shots'))
 
-    def __del__(self):
-        print 'bye'
 
-
-class SpiderStateDodging(State):
+class SpiderStateChasing(State):
     def __init__(self, spider):
-        super(SpiderStateDodging, self).__init__('dodging')
+        super(SpiderStateChasing, self).__init__('chasing')
         self.spider = spider
-
-    def random_destination(self):
-        x = int(self.spider.get_location().x)
-        self.spider.set_destination(Vector(randint(x-200, x+200), 1))  # Always on top
-        self.spider.keep_inside_screen()
 
     def do_actions(self):
         # just move once and then do nothing
         pass
 
     def check_conditions(self, time_passed):
+        sara = self.spider.world.get_player()
+        sara_location = sara.get_location()
+
         spider_location = self.spider.get_location()
-        spider_destination = self.spider.get_destination()
+        spider_destination = sara_location
+
+        self.spider.set_location(sara_location)
+
         if (spider_location.x == float(spider_destination.x) and
             spider_location.y == float(spider_destination.y)):
             return 'shoting'
         return None
 
     def entry_actions(self):
-        self.random_destination()
+        pass
 
 
 class SpiderStateShoting(State):

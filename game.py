@@ -7,6 +7,7 @@ from random import randint
 import menu
 from sara import Sara
 from robot import Robot
+from spider import Spider
 from tank import Tank
 from world import World
 from vector import Vector
@@ -46,7 +47,11 @@ class Game:
         if pygame.font.get_init():
             self.font = pygame.font.Font(settings['font'], 80)
 
+        # TODO use a defaultdict to follow counters of enemies created
+        # where index is classname
         self.robots_created = 0
+        self.spiders_created = 0
+
         for _ in xrange(settings['initial_robots']):
             self.create_robot()
 
@@ -61,6 +66,7 @@ class Game:
     def main(self):
         should_quit = False
         self.possible_enemies[100] = self.create_robot
+        self.possible_enemies[90] = self.create_spider
 
         while not should_quit:
             should_quit = self.process_events()
@@ -152,18 +158,27 @@ class Game:
 
     def create_robot(self):
         robot = Robot(self.world)
+        self.create_enemy(robot)
+        self.robots_created += 1
+
+    def create_spider(self):
+        spider = Spider(self.world)
+        self.create_enemy(spider)
+        self.spiders_created += 1
+
+    def create_enemy(self, enemy):
         sarax = int(self.sara.get_location().x)
         saray = int(self.sara.get_location().y)
         while True:
             x = randint(max(0, sarax - 600), min(sarax + 600, self.world.level_surface.get_width()))
             y = randint(max(0, saray - 600), min(saray + 600, self.world.level_surface.get_height()))
-            robot.set_location(Vector(x, y))
+
+            enemy.set_location(Vector(x, y))
             # Really lazy way to prevent collition at init
-            if not robot.is_colliding_with_impassable_entities():
+            if not enemy.is_colliding_with_impassable_entities():
                 break
 
-        self.world.add_entity(robot, ('enemies', ))
-        self.robots_created += 1
+        self.world.add_entity(enemy, ('enemies', ))
 
     def start_boss_battle(self, trigger, onend=None):
         trigger.props['action'] = None
