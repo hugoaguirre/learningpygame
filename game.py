@@ -26,44 +26,68 @@ class Game:
     def __init__(self, screen):
         self.screen = screen
 
+        ## Init subsystems and assets
         pygame.mixer.music.load(MUSIC_INTRO)
         pygame.mixer.music.set_endevent(SONG_END_EVENT)
         pygame.mixer.music.play(1)
 
-        self.score = 0
+        if pygame.font.get_init():
+            self.font = pygame.font.Font(settings['font'], 80)
 
+        self.images = dict()
+        # TODO consider to provide a magic method to load images
+        self.images['life'] = pygame.image.load(LIFE_IMAGE_FILENAME).convert_alpha()
+
+        # Clock is an important subsystem that allows handling animations,
+        # syncs and wait times
         self.clock = pygame.time.Clock()
 
+        ## Init entities, e.g. world, player and enemies
+
+        # World is different than game, you can see world as a level and the
+        # intereactions between the entities that lives in it
+        # Game might have many worlds.
         self.world = World()
 
+        # sara is player, named after Sara of OpenGameArt.org
         self.sara = Sara(self.world)
         self.sara.set_location(Vector(20, 74))
         self.world.add_entity(self.sara, ('events', 'player'))
 
-        self.images = dict()
-        self.images['life'] = pygame.image.load(LIFE_IMAGE_FILENAME).convert_alpha()
-
-        if pygame.font.get_init():
-            self.font = pygame.font.Font(settings['font'], 80)
-
+        # TODO this robot init seems more a responsability of World instead of game, refactor to fix
         self.robots_created = 0
         for _ in xrange(settings['initial_robots']):
             self.create_robot()
 
+        ## Control variables
+        self.score = 0
+        # TODO fix, refactor to have messages handle in its own class
         self.messages = []
         self.possible_enemies = None
         self.init_enemy_creation()
+
+        ## Run game loop
         self.main()
 
     def init_enemy_creation(self):
+        """Place a function that creates an enemy in the index according to the probability
+        of given enemy to appear
+
+        e.g. Robots are a 100% probable to appear, so place the creation function in index 100
+        """
         self.possible_enemies = [None] * 101
 
     def main(self):
+        """
+        This is the main loop of the game, KISS
+        """
         should_quit = False
         self.possible_enemies[100] = self.create_robot
 
         while not should_quit:
+            # Process user events or custom events
             should_quit = self.process_events()
+            # Process actions that happens in game, like open doors, moving etc
             should_quit |= self.process()
             self.render(should_quit)
             pygame.display.update()
@@ -89,6 +113,9 @@ class Game:
                     enemy_creator()
 
     def process_events(self):
+        """
+        Process the queue of user and custom events
+        """
         events = pygame.event.get()
         for event in events:
             if event.type == SONG_END_EVENT and not settings['debug']:
@@ -115,7 +142,9 @@ class Game:
         self.world.render(self.screen)
 
         if not should_quit:
-            # Use it to render HUD
+            ## Use it to render HUD
+
+            # Render life indicator
             for i in xrange(0, self.sara.life):
                 x = self.images['life'].get_width() * i + 5 * (i + 1)
                 self.screen.blit(self.images['life'], (x, 10))
@@ -136,6 +165,7 @@ class Game:
             return None  # not font subsystem available
 
     def show_game_over(self):
+        # FIX use a constant instead
         filename = 'gameover.jpg'
         pygame.image.save(self.screen, filename)
         im = Image.open(filename)
@@ -150,6 +180,7 @@ class Game:
         pygame.display.update()
         pygame.time.delay(500)
 
+    # TODO this could be better if part of the enemy entity
     def create_robot(self):
         robot = Robot(self.world)
         sarax = int(self.sara.get_location().x)
@@ -165,6 +196,7 @@ class Game:
         self.world.add_entity(robot, ('enemies', ))
         self.robots_created += 1
 
+    # TODO this seems more a responsibility of world
     def start_boss_battle(self, trigger, onend=None):
         trigger.props['action'] = None
         for enemy in self.world.entities.get('enemies', []):
@@ -202,6 +234,7 @@ class Game:
         self.sara.auto_move(Vector(360, 1350))
         self.sara.set_spritesheet(self.sara.ss['down'])
 
+# TODO move it to its own file
 class Message:
     def __init__(self, message, timeout=2, position=(400, 300)):
         self.timeout = timeout

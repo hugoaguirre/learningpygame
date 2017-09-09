@@ -10,6 +10,12 @@ from viewport import Viewport
 
 
 class World:
+    """
+    The first level of our game.
+
+    Orchestrate the interaction of all entities living inside it
+    """
+
     LEVEL_ONE_FILENAME = path_join('assets', 'levels', 'one.tmx')
 
     def __init__(self):
@@ -68,9 +74,11 @@ class World:
 
     def process(self, time_passed):
         self.viewport.move(time_passed)
+        # Delegates processing to each entity
         for entity in self.entities['all']:
             entity.process(time_passed)
 
+        # The most important thing to process in world is detecting collisions
         return self.detect_collisions()
 
     def detect_collisions(self):
